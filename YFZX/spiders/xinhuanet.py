@@ -5,7 +5,7 @@ import time
 import scrapy
 from YFZX.persionalSetting import Save_result
 
-
+#这个爬虫这里的论坛没有写完.新华网站的论坛有很多内容,到时候在想一下怎么处理!!!!
 
 class xinhuanet(scrapy.Spider):
     name = 'xinhuanet'
@@ -86,7 +86,39 @@ class xinhuanet(scrapy.Spider):
 
         #--------------------------------!
         #这里缺少对应的内容提取模块
+
+        content=''
+        for content_p in response.xpath('//*[@id="content"]/p/text()').extract():
+            content+=content_p
+
+        # Re_img_url = re.compile(r'<img src=".*?>')
+        # img_urls=[]
+        img_url_content_all = response.xpath('//*[@id="content"]/p').extract()
+        #     img_url_in_for = Re_img_url.findall(img_url_content_all)
+        #     img_urls.append(img_url_in_for)
+        # print img_urls
+
+        Re_panttern_findimg = re.compile(r'<img.*?src=".*?>')
+        # aritcle_crude=article
+        imgsrclist2 = []
+        for article_crude in img_url_content_all:
+            imgsrc_list = Re_panttern_findimg.findall(article_crude)
+            for img_url in imgsrc_list:
+                # if '' not in img_url:
+                img_in_for = img_url.split('src="')[1].split('"')[0]
+                thisurl_split = response.url.split('c_')[0]
+                imgsrclist2.append(thisurl_split+img_in_for)
+        print imgsrclist2
+        img_urls=imgsrclist2
+
+
+
+
+
         thismeta=response.meta
+        thismeta_data=thismeta['data']
+        thismeta_data['img_urls']=img_urls
+        thismeta_data['content']=content
         pass#
         thisurl=response.url#http://news.xinhuanet.com/politics/2017-07/06/c_1121271022.htm
         thisurl_split=thisurl.split('c_')

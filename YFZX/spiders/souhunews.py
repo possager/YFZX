@@ -85,7 +85,7 @@ class souhunews(scrapy.Spider):
         for article_crude in article:
             imgsrc_list=Re_panttern_findimg.findall(article_crude)
             for img_url in imgsrc_list:
-                if 'http://s1.rr.itc.cn/p/"images/imgloading.jpg' not in img_url:
+                if 'http://s1.rr.itc.cn/p/images/imgloading.jpg' not in img_url:
                     if 'http' in img_url:
                         imgsrclist2.append(img_url.split('"')[1])
                     else:
