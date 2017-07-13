@@ -3,6 +3,9 @@ import scrapy
 import time
 import re
 import json
+from YFZX import gather_all_funtion
+
+
 
 class taihainet(scrapy.Spider):
     name = 'taihainet'
@@ -58,7 +61,12 @@ class taihainet(scrapy.Spider):
             yield scrapy.Request(url=nexturl,meta={'contentid':taihainet_contentid},headers=headers,cookies=cookies)
 
     def deal_content(self,response):
-        print response.body
+        print response
+        for element in gather_all_funtion.get_result_you_need(response):
+            print element
+
+        print '\n\n'
+
         #--------------------------------!
         #这里没有处理对应的content,此外,这个网站没有对应的评论.
         #--------------------------------!
