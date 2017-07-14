@@ -7,12 +7,12 @@ class xilu(scrapy.Spider):
     name = 'xilu'
     urls=[
         'http://m.xilu.com/index.html',
-          # 'http://m.xilu.com/list_1353.html',
-          # 'http://m.xilu.com/list_1283.html',
-          # 'http://m.xilu.com/list_1311.html',
-          # 'http://m.xilu.com/list_1142.html',
-          # 'http://m.xilu.com/list_1412.html',
-          # 'http://m.xilu.com/list_1469.html'
+          'http://m.xilu.com/list_1353.html',
+          'http://m.xilu.com/list_1283.html',
+          'http://m.xilu.com/list_1311.html',
+          'http://m.xilu.com/list_1142.html',
+          'http://m.xilu.com/list_1412.html',
+          'http://m.xilu.com/list_1469.html'
           ]
     def start_requests(self):
         headers = {

@@ -11,9 +11,9 @@ class xinhuanet(scrapy.Spider):
     name = 'xinhuanet'
     urls=[
         'http://qc.wa.news.cn/nodeart/list?nid=113353&pgnum=2&cnt=12',#新闻
-        # 'http://qc.wa.news.cn/nodeart/list?nid=11145724&pgnum=2&cnt=12',#全球
-        # 'http://qc.wa.news.cn/nodeart/list?nid=11145721&pgnum=3&cnt=12',#财经
-        # 'http://qc.wa.news.cn/nodeart/list?nid=11145727&pgnum=2&cnt=12',#娱乐
+        'http://qc.wa.news.cn/nodeart/list?nid=11145724&pgnum=2&cnt=12',#全球
+        'http://qc.wa.news.cn/nodeart/list?nid=11145721&pgnum=3&cnt=12',#财经
+        'http://qc.wa.news.cn/nodeart/list?nid=11145727&pgnum=2&cnt=12',#娱乐
         # 'http://qc.wa.news.cn/nodeart/list?nid=11145722&pgnum=3&cnt=12',#照片
         # 'http://qc.wa.news.cn/nodeart/list?nid=11145737&pgnum=2&cnt=12',#社区
     ]
@@ -86,6 +86,7 @@ class xinhuanet(scrapy.Spider):
 
         #--------------------------------!
         #这里缺少对应的内容提取模块
+
 
         content=''
         for content_p in response.xpath('//*[@id="content"]/p/text()').extract():

@@ -116,6 +116,7 @@ class chinadaily(scrapy.Spider):
                 else:
                     headers[headers_key]=response.headers[headers_key]
         thismeta=response.meta
+
         data={
             'id':thismeta['id'],
             'url':thismeta['url'],
@@ -136,6 +137,11 @@ class chinadaily(scrapy.Spider):
             print response.body
             xpath_data= response.xpath('//div/article/div[1]/h1')
             print response
+
+
+
+
+
 
 
 

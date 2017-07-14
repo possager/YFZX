@@ -7,8 +7,8 @@ import logging
 import json
 
 
-class YFZX(scrapy.Spider):
-    name = 'YFZX'
+class newssc(scrapy.Spider):
+    name = 'newssc'
     start_urls=['http://wap.chengdu.cn/']
 
 
