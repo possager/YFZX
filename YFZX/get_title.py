@@ -38,7 +38,7 @@ def find_compare_list(title_str,webpage_class,maybe_content_list):
     this_content_len=len(title_str)
     if webpage_class.content:
         for one_content in webpage_class.content:
-            if len(one_content)<=this_content_len+2 and len(one_content)>5:
+            if len(one_content)<=this_content_len+5 and len(one_content)>3:#7-14调整过
                 if webpage_class.has_url == 0:
                     maybe_content_list.append({one_content:webpage_class.xpath})
 

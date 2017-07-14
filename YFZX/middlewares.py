@@ -72,7 +72,7 @@ class responseToWhereMiddleware(object):
         Re_pattern_sohudetail=re.compile(r'm.sohu.com/\w/\d.*?')
         Re_pattern_toutiao_detail=re.compile(r'')
         Re_pattern_xinhuanet_content=re.compile(r'xinhuanet.com/[a-z]*?/\d{4}-\d{2}/\d{2}/c_\d*?.htm')#http://m.news.cn/ent/2017-06/30/c_1121238259.htm
-        Re_pattern_taihainet=re.compile(r'm.taihainet.com/news/.*?/.*?/\d{4}-\d{2}-\d{2}/\d*?.htm')#http://m.taihainet.com/news/twnews/latq/2017-07-06/2031222.htm
+        Re_pattern_taihainet=re.compile(r'm.taihainet.com/(lifeid|news)/.*?/.*?/(\d{4}-\d{2}-\d{2}|\d*?)/\d*?.htm')#http://m.taihainet.com/news/twnews/latq/2017-07-06/2031222.htm
 
 
 
@@ -145,6 +145,8 @@ class responseToWhereMiddleware(object):
         elif 'taihainet.com' in request.url:
             if 'http://app.taihainet.com/?app=mobile&controller=list' in request.url:
                 request.callback=spider.deal_index
+            elif request.url=='http://m.taihainet.com/news/':
+                request.callback=spider.getID_from_mainpage
             elif Re_pattern_taihainet.findall(request.url):
                 request.callback=spider.deal_content
         elif 'thepaper.cn' in request.url:
@@ -162,5 +164,5 @@ class responseToWhereMiddleware(object):
         else:
             print '#########################################################################'
             print '          W      R     O      N      G      IN     middleware'
-            print '         this url is ---',request.url
+            print '          the url is ---',request.url
             print '#########################################################################'

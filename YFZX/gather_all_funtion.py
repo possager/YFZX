@@ -13,8 +13,21 @@ def get_result_you_need(response):
     title_return = get_title.get_title(thisclass)
     content_xpath= xpath[0]
     # print title_return  # title是一个只包含一个内容的的字典{title:xpath}
-    title = title_return.keys()[0]
-    title_xpath = title_return.values()[0]
+    # print title_return
+    if not title_return:
+        title='wrong'
+        title_xpath='/html[1]/body[1]/div'#这里证明用一个池子来装xpath路径还是有必要的
+    elif type(title_return)==type('str'):
+        title=title_return.keys()
+        title_xpath=title_return.values()
+    else:
+        title = title_return.keys()[0]
+        title_xpath = title_return.values()[0]
+        # try:
+        #     title_xpath = title_return.values()[0]
+        # except Exception as e:
+        #     print e
+        #     print title_return.values()
     # print title
     # print title_xpath
     content=''
@@ -28,4 +41,4 @@ def get_result_you_need(response):
     publish_time= get_publish_time.find_time(content_block)
     if type(publish_time)==type([]):
         publish_time=publish_time[0]
-    return [title,image_list,content,publish_time]
+    return [title,content,publish_time,image_list]

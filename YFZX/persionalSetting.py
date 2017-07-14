@@ -59,10 +59,11 @@ class ZFile(object):
 
 def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,forum_pubtimestrimp=None):
     basic_file=BASIC_FILE
+    print date_time
     if '-' in date_time and ' ' in date_time:#u'1498141405'这里的两个if是时间戳
         timeArray=time.strptime(date_time,'%Y-%m-%d %H:%M:%S')
         date_time_strip=str(int(time.mktime(timeArray)))
-        print date_time_strip
+        # print date_time_strip
     elif len(date_time)==10 or (len(date_time) >=13 and len(date_time)<19):
         date_time_strip=str(date_time)
     else:
@@ -102,7 +103,7 @@ def Save_org_file(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,fo
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
         timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
         date_time_strip = str(int(time.mktime(timeArray)))
-        print date_time_strip
+        # print date_time_strip
     elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19):
         date_time_strip = str(date_time)
     else:
