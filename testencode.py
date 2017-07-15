@@ -57,24 +57,26 @@ import requests
 import os
 import sys
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+#
+# import random
+#
+# from pybloomfilter import BloomFilter
+#
+# # 申请一个内存等于1M的容器，错误率等于0.001的bloomfilter对象
+# bfilter = BloomFilter(1 * 1024 * 1024, 0.001)
+#
+# # 添加100万个元素
+# for x in xrange(1000000):
+#     bfilter.add(str(x))
+#
+# # 测试错误率
+# error_in = 0
+# for x in xrange(2000000):
+#     if str(x) in bfilter and x > 1000000:
+#         error_in += 1
+#
+# print "error_rate:%s" % (error_in * 1.0 / 1000000)
 
-import random
-
-from pybloomfilter import BloomFilter
-
-# 申请一个内存等于1M的容器，错误率等于0.001的bloomfilter对象
-bfilter = BloomFilter(1 * 1024 * 1024, 0.001)
-
-# 添加100万个元素
-for x in xrange(1000000):
-    bfilter.add(str(x))
-
-# 测试错误率
-error_in = 0
-for x in xrange(2000000):
-    if str(x) in bfilter and x > 1000000:
-        error_in += 1
-
-print "error_rate:%s" % (error_in * 1.0 / 1000000)
+print ['x------>'+str(i) for i in range(10,20)]

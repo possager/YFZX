@@ -100,7 +100,7 @@ class taihainet(scrapy.Spider):
         content=data[1]
         # imglist=data[1]
         # publish_user=response.xpath('/html/body/div[3]/span[2]/span/a')#没有抓取到发帖人,后边单独写一个模块
-        time_format = '’%Y-%m-%d %X'
+        time_format = '%Y-%m-%d %X'
         spider_time = time.strftime(time_format, time.localtime())
         publish_time=data[2]
         img_urls=data[3]

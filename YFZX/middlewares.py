@@ -8,7 +8,7 @@ import re
 from scrapy.exceptions import IgnoreRequest
 
 import scrapy
-from spiders import spider1
+from spiders import chengdu
 
 
 from scrapy import signals
@@ -107,11 +107,11 @@ class responseToWhereMiddleware(object):
 #         elif url_News:
 #             request.callback=spider.parse_newssc_news_index
 
-        elif 'wap.chengdu.cn' == request.url:
-            request.callback=spider.parse_chengdu
-        elif 'chengdu.cn' in request.url:
+        elif 'wap.chengdu.cn' in request.url:
+            request.callback=spider.deal_content
+        # elif 'chengdu.cn' in request.url:
 
-            request.callback=spider.parse_chengdu_news_detail
+            # request.callback=spider.parse_chengdu_news_detail
 
 
         elif 'api.m.sohu.com/autonews' in request.url:
@@ -157,10 +157,6 @@ class responseToWhereMiddleware(object):
         elif 'xilu' in request.url:
             if 'm.xilu.com/list' in request.url or 'm.xilu.com/index.html' in request.url:
                 request.callback=spider.deal_index
-
-
-
-
         else:
             print '#########################################################################'
             print '          W      R     O      N      G      IN     middleware'

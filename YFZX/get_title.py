@@ -35,7 +35,12 @@ def dealcontent(webpage_class):
 
 
 def find_compare_list(title_str,webpage_class,maybe_content_list):
-    this_content_len=len(title_str)
+    if title_str:
+        this_content_len=len(title_str)
+    else:
+        this_content_len=0#后来发现这里边this_content可能是空的
+
+
     if webpage_class.content:
         for one_content in webpage_class.content:
             if len(one_content)<=this_content_len+5 and len(one_content)>3:#7-14调整过
