@@ -6,7 +6,7 @@ import hashlib
 import re
 from YFZX.persionalSetting import BASIC_FILE
 from YFZX.persionalSetting import Save_result
-
+from YFZX.persionalSetting import Save_org_file
 
 
 class mycd_qq(scrapy.Spider):
@@ -74,6 +74,8 @@ class mycd_qq(scrapy.Spider):
 
 
     def deal_content(self,response):
+        Save_result(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.meta['url'],
+                    newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
         headers=response.request.headers
         for i in response.headers:
             headers[i]=response.headers[i]

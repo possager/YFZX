@@ -18,7 +18,7 @@ import hashlib
 
 
 class souhunews(scrapy.Spider):
-    name = 'souhu'
+    name = 'sohu'
     start_urls=['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
 
 

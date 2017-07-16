@@ -5,16 +5,42 @@ redis_connect_pool=redis.ConnectionPool(host='localhost',port=6379)
 redis1=redis.Redis(connection_pool=redis_connect_pool)
 
 
+def change(key):
+    dict1={
+        'sohu':'1',
+        'newssc':'2',
+        'xilu':'3',
+        'chengdu':'4',
+        'taihainet':'5',
+        'toutiao':'6',
+        'xinhuanet':'7',
+        'thepaper':'8',
+        'mycd_qq':'9',
+
+    }
+    try:
+        return dict1[key]
+    except:
+        return '100'
+
+
+
 
 def exisit(key,value,webname):
-    if redis1.exists(webname):
+    key2=change(key)
+    if redis1.exists(webname) and redis1.exists(webname+'_list'):
         if int(redis1.get(webname))<100:
-            if redis1.exists(key):
-                redis1.incr(webname)
-                return 0#已经村咋了
+            j=1
+            while j:
+                j=redis1.rpop(key2)
+                if j==key:
+
+            # if redis1.exists(key):
+                    redis1.incr(webname)
+                    return 0#已经村咋了
             else:
                 try:
-                    redis1.set(key,value)
+                    redis1.lpush(key2,key)
                     return 1
                 except:
                     return 9
@@ -25,11 +51,19 @@ def exisit(key,value,webname):
 
     else:
         redis1.set(webname,0)
-        if redis1.exists(key):
-            return 0#已经村咋了
-        else:
-            try:
-                redis1.set(key,value)
-                return 1
-            except:
-                return 9
+        redis1.lpush(key2,0)
+        # if key in redis1.get(key):
+        #     return 0#已经村咋了
+        # else:
+        try:
+            redis1.lpush(key2,key)
+            return 1
+        except:
+            return 9
+
+
+if __name__ == '__main__':
+    # print exisit('www.baidu.com','2017-12')
+    # print redis1.get('wrong_time')
+    print exisit('www.baidu.com','2017-12',webname='wrong_time')
+    # print redis1.get('wrong_time')
