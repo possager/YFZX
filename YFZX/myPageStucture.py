@@ -17,6 +17,11 @@ class pageStructure:
         self.has_url=0
         self.child={}#用来表示自己的子节点,每一个子节点都是一个pagestructure
         self.divnum=1#用来表示这个标签在网页父标签中的顺序.可以用来计算ND
+        #7-16日添加
+        self.statistics={}#7-16日添加，专门用来统计各个标签出现的次数情况，遍历完了之后也就统计完了
+        self.len_this_tag=0#用来统计这个标签中所有字符的长度
+        self.xpath_num=0#这个指标是用来统计在这个所有的xpath的路径中所有标签出现的次数
+
 
 
     def Init(self):
@@ -70,6 +75,9 @@ class pageStructure:
         # print content_no_Symbol,len(content_no_Symbol)
         # print len(self.content)
 
+
+    # def caculate_stastics(self):
+    #     for
 
     def putin(self,pageStructure):
         if pageStructure.name ==None:

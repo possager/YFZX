@@ -157,6 +157,8 @@ class responseToWhereMiddleware(object):
         elif 'xilu' in request.url:
             if 'm.xilu.com/list' in request.url or 'm.xilu.com/index.html' in request.url:
                 request.callback=spider.deal_index
+            elif 'http://m.xilu.com/v/' in request.url:
+                request.callback=spider.deal_content
         else:
             print '#########################################################################'
             print '          W      R     O      N      G      IN     middleware'

@@ -17,6 +17,7 @@ def deal_response(response):
         # 3,content,
 
         fatherstructure_class.content = fatherfunc.xpath('%s[%d]/text()' % (xpathfunc, numfunc)).extract()
+        fatherstructure_class.len_this_tag=len(fatherfunc.xpath('%s[%d]' % (xpathfunc, numfunc)).extract())
         thischild = fatherfunc.xpath('%s[%d]/child::node()' % (xpathfunc, numfunc))
         has_url = fatherfunc.xpath('%s[%d]/@href' % (xpathfunc, numfunc)).extract()
         if has_url:
@@ -140,6 +141,7 @@ def deal_response(response):
 
             thisclass.name = tag
             thisclass.content = j1.xpath('/%s/text()' % tag).extract()
+            # thisclass.len_this_tag=len(j1.xpath('/%s'%tag).extract())
             thisclass.xpath = xpath
             thisclass.num = 1
             thisclass.divnum = div_number
