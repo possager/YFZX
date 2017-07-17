@@ -6,9 +6,10 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 import re
 from scrapy.exceptions import IgnoreRequest
-
+from YFZX.persionalSetting import Exam_exist
 import scrapy
-from spiders import chengdu
+from YFZX.proxy_to_redis import get_proxy_from_redis
+
 
 
 from scrapy import signals
@@ -114,12 +115,14 @@ class responseToWhereMiddleware(object):
             # request.callback=spider.parse_chengdu_news_detail
 
 
-        elif 'api.m.sohu.com/autonews' in request.url:
-            request.callback=spider.parse
-        elif Re_pattern_sohudetail.findall(request.url):
-            request.callback=spider.SomeOneNewsDeal
-        elif 'm.sohu.com/reply/api/comment/list/cursor?newsId' in request.url:
-            request.callback=spider.commentDeal
+        # elif 'api.m.sohu.com/autonews' in request.url:
+        elif 'sohu.com' in request.url:
+            if 'api.m.sohu.com' in request.url:
+                request.callback=spider.parse
+            elif Re_pattern_sohudetail.findall(request.url):
+                request.callback=spider.SomeOneNewsDeal
+            elif 'm.sohu.com/reply/api/comment/list/cursor?newsId' in request.url:
+                request.callback=spider.commentDeal
         elif 'panda.qq.com' in request.url:
             if '//panda.qq.com/cd/interface/topic/' in request.url and 'pagesize' in request.url:
                 request.callback=spider.deal_index
@@ -164,3 +167,16 @@ class responseToWhereMiddleware(object):
             print '          W      R     O      N      G      IN     middleware'
             print '          the url is ---',request.url
             print '#########################################################################'
+
+
+# class useProxyMiddleware(object):
+#     def process_request(self, request, spider):
+#         # is_Exisit=Exam_exist()
+#         request.headers[]
+
+
+class HttpProxyMiddleware(object):
+    def process_request(self,request,spider):
+        proxy_ip='http://'+get_proxy_from_redis()
+        request.meta['proxy']=proxy_ip
+        print '1'

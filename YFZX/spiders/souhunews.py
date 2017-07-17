@@ -54,8 +54,8 @@ class souhunews(scrapy.Spider):
         # except Exception as e:
         #     print e
         Save_org_file(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
-        Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
-                 newsidOrtid=response.meta['id'], datatype='news')
+        # Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+        #          newsidOrtid=response.meta['id'], datatype='news')
 
         url= response.url
         publish_user= response.meta['publish_user']

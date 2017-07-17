@@ -57,6 +57,7 @@ ROBOTSTXT_OBEY = False
 DOWNLOADER_MIDDLEWARES = {
     # 'YFZX.middlewares.MyCustomDownloaderMiddleware': 543,
     'YFZX.middlewares.responseToWhereMiddleware': 300,
+    'YFZX.middlewares.HttpProxyMiddleware':301
 
 }
 

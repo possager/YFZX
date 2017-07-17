@@ -7,6 +7,9 @@ import re
 from YFZX.persionalSetting import BASIC_FILE
 from YFZX.persionalSetting import Save_result
 from YFZX.persionalSetting import Save_org_file
+from YFZX.persionalSetting import Save_zip
+import random
+
 
 
 class mycd_qq(scrapy.Spider):
@@ -21,14 +24,33 @@ class mycd_qq(scrapy.Spider):
                  'Referer':'http://panda.qq.com/cd/index',
                  'X-Requested-With':'XMLHttpRequest'#关键,没有这个会出现请求过期
                  }
-        url='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=6&pagesize=10'
+        url='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10'
+        time.sleep(random.randint(2,3))
         yield scrapy.Request(url=url,cookies={'pgv_info':'ssid=s2580718070', 'ts_last':'panda.qq.com/cd/index', 'pgv_pvid':'6693827820', 'ts_uid':'6358905536', 'pgv_pvi':'7088397312', 'pgv_si':'s8851519488'},
                              headers=headers)
 
     def deal_index(self, response):
-        print response.headers
-        print response.request.cookies
+        # print response.url
+        # print response.headers
+        # print response.request.cookies
         response_headrs=response.request.headers
+
+        if response.request.cookies:
+            cookies = response.request.cookies
+        else:
+            cookies = {}
+        headers = response.request.headers
+        if 'Set-Cookie' in headers.keys():
+            print response.headers['Set-Cookie']
+            for headers_key in response.headers.keys():
+                if 'Set-Cookie' in headers_key:
+                    set_cookie = response.headers[headers_key]
+                    cookies_name = set_cookie.split(';')[0].split('=')
+                    cookies[cookies_name[0]] = cookies_name[1]
+                else:
+                    headers[headers_key] = response.headers[headers_key]
+
+
 
 
         for headers_key in response.headers.keys():
@@ -70,12 +92,18 @@ class mycd_qq(scrapy.Spider):
                                                                                      'id':tid,
                                                                                     'url':response.url
                                                                                     },headers=response_headrs)
-            break
 
+        #7-16日添加,增加对应所有链接的url
+        urlindex_this=response.url
+        urlindex_next_split= urlindex_this.split('page=')
+        urlindex_next=urlindex_next_split[0]+'page='+str(int(urlindex_next_split[1].split('&')[0])+1)+'&pagesize=10'
+        yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies)
 
     def deal_content(self,response):
-        Save_result(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.meta['url'],
+        Save_org_file(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.url,#这里边的网页的回复本身就是json
                     newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
+        Save_zip(plantform='mycdqq',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news')
+
         headers=response.request.headers
         for i in response.headers:
             headers[i]=response.headers[i]
@@ -124,10 +152,6 @@ class mycd_qq(scrapy.Spider):
         except Exception as e:
             print e
         yield scrapy.Request(url=url_comment,headers=headers,cookies=cookiedict,meta=data)
-
-
-
-
 
     def deal_comment(self,response):
         headers = response.request.headers
