@@ -73,8 +73,11 @@ class responseToWhereMiddleware(object):
         hash_url=str(hashlib.md5(url_request).hexdigest())
         thisclass=path_to_redis()
         num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
-        if num_result==:
-            return IgnoreRequest
+        if thisclass.redis.get(request.meta['plant_form'])>100:
+            raise 1
+        if num_result==0:
+            thisclass.redis.incr(request.meta['plant_form'])
+            return IgnoreRequest#已经爬去过了
 
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
