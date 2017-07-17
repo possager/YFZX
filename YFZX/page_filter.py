@@ -30,9 +30,10 @@ class path_to_redis:
 
     def examing(self,url_to_exam,plantform):
         key2=change(plantform)
-        List_redis=self.redis.get(key2)
-        print List_redis
-
+        # List_redis=self.redis.get(key2)
+        # print List_redis
+        for i in range(self.redis.llen(key2)):
+            print self.redis.lindex(key2,i)
 
 
 if __name__ == '__main__':

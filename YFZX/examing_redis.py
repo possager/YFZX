@@ -1,4 +1,5 @@
 #_*_coding:utf-8_*_
+#这个函数在每次请求回来是检测是否存在了,与另一个redis的代码有区别
 import redis
 
 redis_connect_pool=redis.ConnectionPool(host='localhost',port=6379)
