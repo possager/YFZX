@@ -21,8 +21,8 @@ def get_Proxy():
             redis1.rpush('999',proxyip)
     get_proxy_to_redis()
     while True:
-        while redis1.llen('999')<200:
-            time.sleep(random.randint(2,4))
+        while redis1.llen('999') < 200:
+            time.sleep(random.randint(5,8))
             get_proxy_to_redis()
 
 
@@ -37,6 +37,6 @@ def test_proxy():
     print data.text
 
 if __name__ == '__main__':
-    # get_Proxy()
+    get_Proxy()
     # print get_proxy_from_redis()
-    test_proxy()
+    # test_proxy()

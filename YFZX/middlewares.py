@@ -9,10 +9,14 @@ from scrapy.exceptions import IgnoreRequest
 from YFZX.persionalSetting import Exam_exist
 import scrapy
 from YFZX.proxy_to_redis import get_proxy_from_redis
+# import threading
 
 
 
 from scrapy import signals
+import hashlib
+from YFZX.page_filter import path_to_redis
+
 
 
 class YfzxSpiderMiddleware(object):
@@ -65,6 +69,13 @@ class YfzxSpiderMiddleware(object):
 
 class responseToWhereMiddleware(object):
     def process_request(self, request, spider):
+        url_request=request.url
+        hash_url=str(hashlib.md5(url_request).hexdigest())
+        thisclass=path_to_redis()
+        num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
+        if num_result==:
+            return IgnoreRequest
+
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         Re_pattern_newssc_news = re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -80,6 +91,7 @@ class responseToWhereMiddleware(object):
         print request.url
         if 'http://www.newssc.org/' == request.url:
             request.callback=spider.parse_newssc
+
         elif 'newssc.org' in request.url:
 
             url_otherHomepage = Re_pattern_newssc_index.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
@@ -177,6 +189,18 @@ class responseToWhereMiddleware(object):
 
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
-        proxy_ip='http://'+get_proxy_from_redis()
-        request.meta['proxy']=proxy_ip
-        print '1'
+        # thread1=threading.Thread(target=)
+
+
+        try:
+            proxy_ip='http://'+get_proxy_from_redis()
+            request.meta['proxy']=proxy_ip
+            print 'set proxy successfully'
+        except Exception as e:
+            print e
+
+
+class refuseMiddleware(object):
+    def process_spider_input(self,response,spider):
+        if response.status in [400,403]:#这里还缺少一个url被404的次数
+            return response.request

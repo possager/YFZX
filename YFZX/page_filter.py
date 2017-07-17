@@ -25,19 +25,23 @@ class path_to_redis:
 
                     num_changed=change(wenjianZip_split[0])
                     hash_vlaue=wenjianZip_split[3]
-                    self.redis.rpush(num_changed,hash_vlaue)
-
+                    # self.redis.rpush(num_changed,hash_vlaue)
+                    self.redis.hset(num_changed,hash_vlaue,1)#这里的1是随便设置的
 
     def examing(self,url_to_exam,plantform):
         key2=change(plantform)
         # List_redis=self.redis.get(key2)
         # print List_redis
-        for i in range(self.redis.llen(key2)):
-            print self.redis.lindex(key2,i)
+        # for i in range(self.redis.llen(key2)):
+        #     print self.redis.lindex(key2,i)
+        hash_url=str(hashlib.md5(url_to_exam).hexdigest())
+        result_num=self.redis.hset(key2,hash_url,1)
+        return result_num
 
 
 if __name__ == '__main__':
     thisclass=path_to_redis()
     # thisclass.Init()
     # thisclass.scan(BASIC_FILE)
-    thisclass.examing(url_to_exam='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10',plantform='sohu')
+    result_num=thisclass.examing(url_to_exam='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10',plantform='sohu')
+    print result_num

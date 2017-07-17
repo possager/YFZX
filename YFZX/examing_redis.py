@@ -33,7 +33,7 @@ def exisit(key,value,webname):
         if int(redis1.get(webname))<100:
             j=1
             while j:
-                j=redis1.rpop(key2)
+                j=redis1.rpop(key2)#这里设计错了，pop出来的话那么原列表都空了
                 if j==key:
 
             # if redis1.exists(key):

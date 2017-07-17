@@ -11,7 +11,7 @@ import os
 
 
 
-BASIC_FILE='/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one'
+BASIC_FILE='/media/liang/Data/project/YFzhongxin/dataGetBySpider/one'
 #这里边几个函数的最后一个变量向来是没什么用的
 
 class ZFile(object):
