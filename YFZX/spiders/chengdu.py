@@ -12,7 +12,7 @@ import time
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    start_urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1696961)]#1893603
+    start_urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603
 
 
     # def parse(self,response):

@@ -10,6 +10,7 @@ from YFZX.persionalSetting import BASIC_FILE
 from YFZX.persionalSetting import Save_result
 from YFZX.persionalSetting import Save_org_file
 from YFZX.persionalSetting import Save_zip
+from scrapy.exceptions import CloseSpider
 import chardet
 import os
 import coding
@@ -18,8 +19,37 @@ import hashlib
 
 
 class souhunews(scrapy.Spider):
+    # name = 'sohu'
+
+    # def start_request(self):
+    #     urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
+    #     headers = {
+    #         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
+    #         # 'Accept': 'application/json',
+    #         # 'Accept-Encoding': 'gzip, deflate, sdch',
+    #         # 'Accept-Language': 'zh-CN,zh;q=0.8',
+    #         # 'Connection': 'keep-alive',
+    #         # 'X-Requested-With': 'XMLHttpRequest'  # 关键,没有这个会出现请求过期
+    #     }
+    #     for url in urls:
+    #         yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
     name = 'sohu'
-    start_urls=['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
+
+    def start_requests(self):
+        headers = {
+                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
+            #         # 'Accept': 'application/json',
+            #         # 'Accept-Encoding': 'gzip, deflate, sdch',
+            #         # 'Accept-Language': 'zh-CN,zh;q=0.8',
+            #         # 'Connection': 'keep-alive',
+            #         # 'X-Requested-With': 'XMLHttpRequest'  # 关键,没有这个会出现请求过期
+                }
+        urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
+        for url in urls:
+            yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
+
+    def parse(self, response):
+        print response.body
 
 
     def parse(self, response):
@@ -39,14 +69,18 @@ class souhunews(scrapy.Spider):
                                                                                                  'publish_time':i['created_time'].replace('T',' '),
                                                                                                  'id':i['id'],
                                                                                                  'original_url':response.url,
+                                                                                                 'plant_form':'sohu'
                                                                                                  })
 
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
+        }
         urlnext='https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1'
         urldeal1=urlnext.split('s=')[0]
         urldealnum=urlnext.split('s=')[1].split('&')[0]
         urldeal3=urlnext.split('s=')[1].split('&')[1]
         if int(urldealnum)<950:
-            yield urldeal1+str(int(urldealnum)+2)+urldeal3+'&dc=1'
+            yield scrapy.Request(url=urldeal1+str(int(urldealnum)+2)+urldeal3+'&dc=1',headers=headers,meta={'plant_form':'None'})
 
     def SomeOneNewsDeal(self,response):
         # try:
@@ -54,13 +88,17 @@ class souhunews(scrapy.Spider):
         # except Exception as e:
         #     print e
         Save_org_file(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
-        # Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
-        #          newsidOrtid=response.meta['id'], datatype='news')
+        Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+                 newsidOrtid=response.meta['id'], datatype='news')
 
         url= response.url
         publish_user= response.meta['publish_user']
         title= response.meta['title']
-        publish_time= response.meta['publish_time']
+        time_format = '’%Y-%m-%d %X'
+        # spider_time = time.strftime(time_format, time.localtime())  # spider_time
+        # publish_time = post['pubtime']  # publish_time
+        # publish_time= time.strftime(time_format,response.meta['publish_time'])
+        publish_time=response.meta['publish_time']
         read_count=response.meta['read_count']
         newsid=response.meta['id']
 
@@ -120,7 +158,8 @@ class souhunews(scrapy.Spider):
                                                                                                                                                                'content':content,
                                                                                                                                                                'img_urls':imgsrclist2,
                                                                                                                                                                'data':data,
-                                                                                                                                                               'newsid':newsid
+                                                                                                                                                               'newsid':newsid,
+                                                                                                                                                               'plant_form':'None'
                                                                                                                                                                })
 
     def commentDeal(self,response):
@@ -190,7 +229,8 @@ class souhunews(scrapy.Spider):
                 commenturlnowSplit = response.url.split('preCursor=')
                 commenturlnext = commenturlnowSplit[0] + 'preCursor=' + str(thiscommentLastId) + '&'+commenturlnowSplit('&')[1]
                 yield scrapy.Request(url=commenturlnext,meta={'data':preCommentDict,
-                                                              'newsid':newsid})
+                                                              'newsid':newsid,
+                                                              'plant_form':'None'})
             except Exception as e:
                 print e,'wrong1'
 
@@ -232,4 +272,8 @@ class souhunews(scrapy.Spider):
             #     with open(thiscommentfile+str('/'+'Sohu_'+str(int(time.mktime(time.strptime(response.meta['publish_time'],'%Y-%m-%d %H:%M:%S'))))+'_'+str(hashlib.md5(response.url).hexdigest())+'_'+str(response.meta['newsid'])),'w+') as cmfl:
             #         # cmfl.write(json.loads(preCommentDict))
             #         json.dump({'data':response.meta['data']},cmfl)
+            # Save_zip(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['newsid'],datatype='news')
         print '----------------------------------------'
+
+    def close(spider, reason):
+        raise CloseSpider('nothing')

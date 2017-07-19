@@ -42,6 +42,6 @@ class path_to_redis:
 if __name__ == '__main__':
     thisclass=path_to_redis()
     # thisclass.Init()
-    # thisclass.scan(BASIC_FILE)
-    result_num=thisclass.examing(url_to_exam='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10',plantform='sohu')
-    print result_num
+    thisclass.scan(BASIC_FILE)
+    # result_num=thisclass.examing(url_to_exam='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10',plantform='sohu')
+    # print result_num

@@ -32,7 +32,7 @@ class xilu(scrapy.Spider):
 
         }
         for url_to_visit in self.urls:
-            yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":"4"}},headers=headers)
+            yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":"4"}},headers=headers,meta={'plant_form':'None'})
 
     def deal_index(self, response):
 
@@ -82,7 +82,8 @@ class xilu(scrapy.Spider):
                     'publish_time':publish_time,
                     'id':id,
                     'url':url_page
-                }
+                },
+                'plant_form':'xilu'
             })
 
     def deal_content(self,response):
@@ -95,4 +96,5 @@ class xilu(scrapy.Spider):
         data['content']=content
         persionalSetting.Save_result(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
                                        newsidOrtid=response.meta['data']['id'],datatype='news',full_data=data)
-        persionalSetting.Save_zip()
+        persionalSetting.Save_zip(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
+                                       newsidOrtid=response.meta['data']['id'],datatype='news')

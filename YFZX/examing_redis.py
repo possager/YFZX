@@ -24,10 +24,26 @@ def change(key):
     except:
         return '100'
 
+def creat_url_list_in_redis():
+    dict1 = {
+        'sohu': 1,
+        'newssc': 2,
+        'xilu': 3,
+        'chengdu': 4,
+        'taihainet': 5,
+        'toutiao': 6,
+        'xinhuanet': 7,
+        'thepaper': 8,
+        'mycd_qq': 9,
+        'other':100
+
+    }
+    for i in dict1.iteritems():
+        redis1.set(str(i[1]+i[1]),1)
+    # redis1.set(plant_form,1)
 
 
-
-def exisit(key,value,webname):
+def exisit(key,value,webname):#这个函数暂时没用了,pagefilter中有正确的功能的代码
     key2=change(key)
     if redis1.exists(webname) and redis1.exists(webname+'_list'):
         if int(redis1.get(webname))<100:
@@ -66,5 +82,6 @@ def exisit(key,value,webname):
 if __name__ == '__main__':
     # print exisit('www.baidu.com','2017-12')
     # print redis1.get('wrong_time')
-    print exisit('www.baidu.com','2017-12',webname='wrong_time')
+    # print exisit('www.baidu.com','2017-12',webname='wrong_time')
     # print redis1.get('wrong_time')
+    creat_url_list_in_redis()

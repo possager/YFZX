@@ -8,7 +8,9 @@ import re
 from scrapy.exceptions import IgnoreRequest
 from YFZX.persionalSetting import Exam_exist
 import scrapy
+from scrapy.exceptions import CloseSpider
 from YFZX.proxy_to_redis import get_proxy_from_redis
+# from YFZX.examing_redis import
 # import threading
 
 
@@ -69,15 +71,27 @@ class YfzxSpiderMiddleware(object):
 
 class responseToWhereMiddleware(object):
     def process_request(self, request, spider):
-        url_request=request.url
-        hash_url=str(hashlib.md5(url_request).hexdigest())
-        thisclass=path_to_redis()
-        num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
-        if thisclass.redis.get(request.meta['plant_form'])>100:
-            raise 1
-        if num_result==0:
-            thisclass.redis.incr(request.meta['plant_form'])
-            return IgnoreRequest#已经爬去过了
+        if request.meta['plant_form']!='None':
+            url_request=request.url
+            hash_url=str(hashlib.md5(url_request).hexdigest())
+            thisclass=path_to_redis()
+            num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
+            num_exist= thisclass.redis.get(str(request.meta['plant_form']+request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
+            if num_exist is not None and int(num_exist)>100:
+                print 'num_exist-------------------',num_exist
+                # raise CloseSpider()
+                # return IgnoreRequest
+                thisclass.redis.set(str(request.meta['plant_form']+request.meta['plant_form']),0)
+                request.callback=spider.close
+                return request
+
+
+            if num_result==0:
+
+
+                thisclass.redis.incr(str(request.meta['plant_form']+request.meta['plant_form']))
+                num_exist = thisclass.redis.get(str(request.meta['plant_form'] + request.meta['plant_form']))
+                raise IgnoreRequest()#已经爬去过了
 
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
@@ -193,14 +207,13 @@ class responseToWhereMiddleware(object):
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
         # thread1=threading.Thread(target=)
-
-
-        try:
-            proxy_ip='http://'+get_proxy_from_redis()
-            request.meta['proxy']=proxy_ip
-            print 'set proxy successfully'
-        except Exception as e:
-            print e
+        if 'sohu.com' not in request.url:
+            try:
+                proxy_ip='http://'+get_proxy_from_redis()
+                request.meta['proxy']=proxy_ip
+                print 'set proxy successfully'
+            except Exception as e:
+                print e
 
 
 class refuseMiddleware(object):

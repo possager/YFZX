@@ -8,6 +8,7 @@ from YFZX.persionalSetting import BASIC_FILE
 from YFZX.persionalSetting import Save_result
 from YFZX.persionalSetting import Save_org_file
 from YFZX.persionalSetting import Save_zip
+from scrapy.exceptions import CloseSpider
 import random
 
 
@@ -27,7 +28,7 @@ class mycd_qq(scrapy.Spider):
         url='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10'
         time.sleep(random.randint(2,3))
         yield scrapy.Request(url=url,cookies={'pgv_info':'ssid=s2580718070', 'ts_last':'panda.qq.com/cd/index', 'pgv_pvid':'6693827820', 'ts_uid':'6358905536', 'pgv_pvi':'7088397312', 'pgv_si':'s8851519488'},
-                             headers=headers)
+                             headers=headers,meta={'plant_form':'None'})#plant_form在examing_redis中可以找到对应的代码值
 
     def deal_index(self, response):
         # print response.url
@@ -64,14 +65,22 @@ class mycd_qq(scrapy.Spider):
         # headers_in_index['Referer']=response.url
 
         print response_headrs
-        response_Json=json.loads(response.body)
+        try:
+            response_Json=json.loads(response.body)#7-18日发现里边有很多时候是空的.
+        except Exception as e:
+            return
         for data_data in response_Json['data']['data']:
             print data_data['favorited']#收藏
             like_count= data_data['favtimes']#like_count
             publish_user_id= data_data['uid']#publish_user_id
             title= data_data['subject']#title
             reply_count= data_data['replies']#reply_count
-            publish_time= data_data['pubtime']#publish_time
+
+            time_format = '’%Y-%m-%d'
+            publish_time_stamp_9 = time.localtime(float(data_data['pubtime']))
+            publish_time = time.strftime(time_format, publish_time_stamp_9)
+
+            # publish_time= data_data['pubtime']#publish_time
             read_count= data_data['views']#read_count
             print data_data['shares']#fenxiangshuliang
             publisher_name= data_data['author']['nickname']#publisher_name
@@ -83,6 +92,7 @@ class mycd_qq(scrapy.Spider):
             yield scrapy.Request(url='http://panda.qq.com/cd/interface/topic/getThreadByTid?s_code=&tid='+str(tid),meta={'like_count':like_count,
                                                                                      'publish_user_id':publish_user_id,
                                                                                      'title':title,
+                                                                                    'plant_form': 'mycd_qq',
                                                                                      'spider_time':time.time(),
                                                                                      'reply_count':reply_count,
                                                                                      'publish_time':publish_time,
@@ -97,7 +107,7 @@ class mycd_qq(scrapy.Spider):
         urlindex_this=response.url
         urlindex_next_split= urlindex_this.split('page=')
         urlindex_next=urlindex_next_split[0]+'page='+str(int(urlindex_next_split[1].split('&')[0])+1)+'&pagesize=10'
-        yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies)
+        yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies,meta={'plant_form':'None'})
 
     def deal_content(self,response):
         Save_org_file(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.url,#这里边的网页的回复本身就是json
@@ -142,6 +152,8 @@ class mycd_qq(scrapy.Spider):
         data['img_urls']=img_urls
         data['reply_nodes']=[]
         data['reproduce_count']=reproduce_count
+        data['plant_form']='mycd_qq'
+
 
 
         url_comment='http://panda.qq.com/cd/interface/topic/getRepliesByTid?s_code=&tid='+response.meta['id']+'&page=1&sort=time&size=20'
@@ -176,9 +188,11 @@ class mycd_qq(scrapy.Spider):
                 url= response.url#url
                 publish_user= post['author']['nickname']#publish_user
                 publish_user_photo= post['author']['headimgurl']#publish_user_photo       maybe is no heading----http://panda.qq.com/static/images/noheadimg.png
-                time_format = '’%Y-%m-%d %X'
+                time_format = '’%Y-%m-%d'
                 spider_time = time.strftime(time_format, time.localtime())#spider_time
-                publish_time= post['pubtime']#publish_time
+                # time1=time.localtime()
+                publish_time_stamp_9=time.localtime(float(post['pubtime']+'.00'))
+                publish_time= time.strftime(time_format,publish_time_stamp_9)#publish_time
                 comment_only_one={
                     'content':content,
                     'publish_user_id':publish_user_id,
@@ -194,6 +208,7 @@ class mycd_qq(scrapy.Spider):
 
             this_comment_url=response.url.split('&page=')
             next_comment_url=this_comment_url[0]+'&page='+str(int(this_comment_url[1].split('&')[0])+1)+'&sort=time&size=20'
+            response.meta['plant_form']='None'#7-18日添加,因为评论的url都是一样的,如果检测的话,会导致出问题
             yield scrapy.Request(url=next_comment_url,headers=headers,meta=response.meta)
         else:#请求完成
             resultdict={
@@ -221,3 +236,7 @@ class mycd_qq(scrapy.Spider):
             result_json=json.dumps(resultdict)
             Save_result(plantform='mycdqq',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['id'],datatype='news',full_data=resultdict)
 
+
+
+    def close(spider, reason):
+        raise CloseSpider('nothing')
