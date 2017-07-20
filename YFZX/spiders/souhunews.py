@@ -9,6 +9,7 @@ from YFZX.persionalSetting import BASIC_FILE
 from YFZX.persionalSetting import Save_result
 from YFZX.persionalSetting import Save_org_file
 from YFZX.persionalSetting import Save_zip
+from YFZX import gather_all_funtion
 from scrapy.exceptions import CloseSpider
 import chardet
 import os
@@ -19,14 +20,17 @@ import hashlib
 
 class souhunews(scrapy.Spider):
     name = 'sohu'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
+    }
 
     def start_requests(self):
         headers = {
                     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
                 }
-        urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
+        # urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']#'http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=9&size=20'
+        urls=['http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=1&size=20']
         for url in urls:
-            print 'test'
             yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
 
     # def parse(self, response):
@@ -69,6 +73,32 @@ class souhunews(scrapy.Spider):
             print 'sucessfully yield----',urlnext
 
 
+    def deal_index2(self,response):
+        data_json=json.loads(response.body)
+        for data_in_json in data_json:
+            publish_user=data_in_json['authorName']
+            title=data_in_json['title']
+            id=data_in_json['id']
+            publish_user_id=data_in_json['authorId']
+            publish_time=data_in_json['publicTime']
+            urlnext='http://m.sohu.com/a/'+str(id)+'_'+str(publish_user_id)
+            yield scrapy.Request(url=urlnext,headers=self.headers,meta={'data':{
+                'publish_user':publish_user,
+                'title':title,
+                'id':id,
+                'publish_user_id':publish_user_id,
+                'publish_time':int(publish_time)/1000
+            },
+            'plant_form':'sohu',
+            'publish_time':publish_time,
+            'id':id,
+            'publish_user':publish_user,
+            'title':title})
+        url_this_index=response.url.split('page=')
+        url_next_index=url_this_index[0]+'page='+str(int(url_this_index[1].split('&')[0]+1))+'&size=20'
+        yield scrapy.Request(url=url_next_index,headers=self.headers,meta={'plant_form':'None'})
+
+
     def SomeOneNewsDeal(self,response):
         # try:
         #     print response.xpath('/html/body/section[1]/article/h1/text()').extract()[0]
@@ -93,13 +123,14 @@ class souhunews(scrapy.Spider):
 
         for content_p in response.xpath('/html/body/section[1]/article/p'):
             try:
-                article_content=article_content+content_p.xpath('text()').extract()[0]
+                article_content=article_content+content_p.xpath('text()').extract().pop()
 
                 # print chardet.detect(article_content)
 
 
             except Exception as e:
                 print e
+                print 'wrong in get content'
         time_format='’%Y-%m-%d %X'
         spider_time=time.strftime(time_format,time.localtime())
         # print spider_time
@@ -148,6 +179,43 @@ class souhunews(scrapy.Spider):
                                                                                                                                                                'newsid':newsid,
                                                                                                                                                                'plant_form':'None'
                                                                                                                                                                })
+
+    def deal_content2(self,response):
+        # print response.url
+        data_TCPI=gather_all_funtion.get_result_you_need(response)
+        content=data_TCPI[1]
+        # publish_time=data_TCPI[2]
+        img_urls=data_TCPI[3]
+        time_format = '%Y-%m-%d'
+        spider_time = time.strftime(time_format, time.localtime())
+        publish_time=time.strftime(time_format,time.localtime(float(response.meta['publish_time'])))
+
+        # print response.body
+        data=response.meta['data']
+        data['content']=content
+        data['reply_nodes']=[]
+
+
+
+
+        Re_find_comment_id=re.compile(r'cms_id: \'.*?\'')
+        try:
+            comment_id=Re_find_comment_id.findall(response.body)
+            print content
+            print '\n'
+            print data_TCPI[0]
+            comment_id_find_by_re=comment_id[0]
+            comment_id_find_by_re=comment_id_find_by_re.split("\'")[1]
+            #https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id=3500748995&page_no=2
+            url_to_comments='https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id='+str(comment_id_find_by_re)+'&page_no=2'
+            yield scrapy.Request(url=url_to_comments,headers=response.headers,meta={'plant_form':'None',
+                                                                                    'data':data
+                                                                                    })
+        except Exception as e:
+            print e
+
+        # yield scrapy.Request(url='None')
+
 
     def commentDeal(self,response):
 
@@ -264,3 +332,73 @@ class souhunews(scrapy.Spider):
 
     # def close(spider, reason):
     #     raise CloseSpider('nothing')
+
+
+    def deal_comment2(self,response):#处理https://apiv2.sohu.com/api/comment/list?这样的url返回的评论
+        try:
+            data_json = json.loads(response.body)
+            if data_json['jsonObject']['error_code']:
+                return scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5',meta={'plant_form':'None'})
+        except Exception as e:
+            # yield scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5')
+            pass
+            try:
+                data_json=json.loads(response.body.split('(')[1].split(')')[0])
+            except Exception as e:
+                # print response.body
+                return
+
+        reply_nodes=[]
+        print data_json
+        for comment in data_json['jsonObject']['comments']:
+            publish_user=comment['passport']['nickname']
+            publish_user_id=comment['passport']['user_id']
+            publish_time=comment['create_time']
+            publish_user_photo=comment['passport']['img_url']
+            content=comment['content']
+            reply_count=comment['reply_count']
+            url=response.url
+            id=comment['comment_id']
+            child_node={
+                'publish_user':publish_user,
+                'publish_user_id':publish_user_id,
+                'publish_time':publish_time,
+                'publish_user_photo':publish_user_photo,
+                'content':content,
+                'reply_count':reply_count,
+                'url':url,
+                'id':id
+            }
+            response.meta['data']['reply_nodes'].append(child_node)
+
+
+    def deal_comment3(self,response):#这里的评论处理是最后一个的时候,在其他的处理模块里都处理不了的时候才处理的,
+        #要注意的是,现在一共返现了3个comment评论的来源链接
+        try:
+            thiscommentList=[]
+            data_json=json.loads(response.body)
+            if not data_json['jsonObject']['comments']:
+                print 'no informathion in comment3'
+                return
+            for comment in data_json['jsonObject']['comments']:
+                comment['content'] = comment['content']
+                comment['like_count'] = comment['support_count']  # 赞成数
+                print comment['comments']  # 是否有自评论
+                comment['id'] = comment['comment_id']  # 言论id
+                comment['publish_time'] = comment['create_time']  #
+                comment['reply_count'] = len(comment['comments'])
+                comment['publish_user'] = comment['passport']['nickname']
+                comment['url'] = response.url
+                comment['sonid'] = comment['reply_id']  # 父贴id
+                thiscommentList.append(comment)
+            data=response.meta
+            data['reply_nodes'].append(data)
+
+#http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5
+            url_this_comment=response.url.split('page_no=')
+            url_next_comment=url_this_comment[0]+'page_no='+str(int(url_this_comment[1].split('&')[0])+1)+'&'+url_this_comment[1].split('&')[1]
+            print url_next_comment
+            yield scrapy.Request(url=url_next_comment,meta={'data':data})
+        except Exception as e:
+            print e
+            return

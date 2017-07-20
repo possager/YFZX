@@ -12,11 +12,14 @@ import time
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    start_urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603
+    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603
 
 
     # def parse(self,response):
     #     print 'In parse default'
+    def start_requests(self):
+        for url in self.urls:
+            yield scrapy.Request(url=url,meta={'plant_form':'chengdu'})
     def deal_content(self, response):
 
         # Re_pattern_index=re.compile(r'\bhttp://.*?\.newssc\.org/\B')#不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
@@ -114,9 +117,9 @@ class newssc(scrapy.Spider):
 
 
 
-    def get_Href_By_Re(self,response,special_words):
-        hreflist = response.selector.re(r'href=".*?"')
-        for i in hreflist:
-            urlinMainPage = i.replace('href=', '').replace('"', '')
-            if 'http' in urlinMainPage and 'css' not in urlinMainPage and special_words in urlinMainPage:
-                yield urlinMainPage
+    # def get_Href_By_Re(self,response,special_words):
+    #     hreflist = response.selector.re(r'href=".*?"')
+    #     for i in hreflist:
+    #         urlinMainPage = i.replace('href=', '').replace('"', '')
+    #         if 'http' in urlinMainPage and 'css' not in urlinMainPage and special_words in urlinMainPage:
+    #             yield urlinMainPage

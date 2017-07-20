@@ -74,27 +74,27 @@ class responseToWhereMiddleware(object):
 
 
         #添加的判断是否重复功能的模块
-        if request.meta['plant_form']!='None':
-            url_request=request.url
-            hash_url=str(hashlib.md5(url_request).hexdigest())
-            thisclass=path_to_redis()
-            num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
-            num_exist= thisclass.redis.get(str(request.meta['plant_form']+request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
-            print num_exist
-            if num_exist is not None and int(num_exist)>100:
-                # raise CloseSpider()
-                # return IgnoreRequest
-                num_plant_form = change(request.meta['plant_form'])
-                thisclass.redis.set(num_plant_form+num_plant_form,0)
-                raise CloseSpider()
-                # request.callback=spider.close
-                # return request
-            if num_result==0:
-                num_plant_form = change(request.meta['plant_form'])
-                thisclass.redis.incr(num_plant_form+num_plant_form)
-                num_exist = thisclass.redis.get(num_plant_form+num_plant_form)
-                print request.url,'has been crawled'
-                raise IgnoreRequest()#已经爬去过了
+        # if request.meta['plant_form']!='None':
+        #     url_request=request.url
+        #     hash_url=str(hashlib.md5(url_request).hexdigest())
+        #     thisclass=path_to_redis()
+        #     num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
+        #     num_exist= thisclass.redis.get(str(request.meta['plant_form']+request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
+        #     # print num_exist
+        #     if num_exist is not None and int(num_exist)>100:
+        #         # raise CloseSpider()
+        #         # return IgnoreRequest
+        #         num_plant_form = change(request.meta['plant_form'])
+        #         thisclass.redis.set(num_plant_form+num_plant_form,0)
+        #         raise CloseSpider()
+        #         # request.callback=spider.close
+        #         # return request
+        #     if num_result==0:
+        #         num_plant_form = change(request.meta['plant_form'])
+        #         thisclass.redis.incr(num_plant_form+num_plant_form)
+        #         num_exist = thisclass.redis.get(num_plant_form+num_plant_form)
+        #         print request.url,'has been crawled'
+        #         # raise IgnoreRequest()#已经爬去过了
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         Re_pattern_newssc_news = re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -130,10 +130,19 @@ class responseToWhereMiddleware(object):
         elif 'sohu.com' in request.url:
             if 'api.m.sohu.com' in request.url:
                 request.callback=spider.deal_index
+            elif 'sohu.com/a/' in request.url:
+                request.callback=spider.deal_content2
             elif Re_pattern_sohudetail.findall(request.url):
                 request.callback=spider.SomeOneNewsDeal
+            elif 'http://v2.sohu.com/public-api/feed?' in request.url:
+                request.callback=spider.deal_index2
             elif 'm.sohu.com/reply/api/comment/list/cursor?newsId' in request.url:
                 request.callback=spider.commentDeal
+            elif 'https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id' in request.url:##7-20发现漏掉链接
+                request.callback=spider.deal_comment2
+                print request.url
+            elif 'http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=' in request.url:#7-20日发现这个url在每次请求评论的时候会出现在第一次的请求中.
+                request.callback=spider.deal_comment3
         elif 'panda.qq.com' in request.url:
             if '//panda.qq.com/cd/interface/topic/' in request.url and 'pagesize' in request.url:
                 request.callback=spider.deal_index

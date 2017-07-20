@@ -76,7 +76,7 @@ class mycd_qq(scrapy.Spider):
             title= data_data['subject']#title
             reply_count= data_data['replies']#reply_count
 
-            time_format = '’%Y-%m-%d'
+            time_format = '%Y-%m-%d'
             publish_time_stamp_9 = time.localtime(float(data_data['pubtime']))
             publish_time = time.strftime(time_format, publish_time_stamp_9)
 
@@ -188,7 +188,7 @@ class mycd_qq(scrapy.Spider):
                 url= response.url#url
                 publish_user= post['author']['nickname']#publish_user
                 publish_user_photo= post['author']['headimgurl']#publish_user_photo       maybe is no heading----http://panda.qq.com/static/images/noheadimg.png
-                time_format = '’%Y-%m-%d'
+                time_format = '%Y-%m-%d'
                 spider_time = time.strftime(time_format, time.localtime())#spider_time
                 # time1=time.localtime()
                 publish_time_stamp_9=time.localtime(float(post['pubtime']+'.00'))

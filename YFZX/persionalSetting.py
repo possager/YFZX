@@ -11,7 +11,7 @@ import os
 
 
 
-BASIC_FILE='F:/project/YFzhongxin/dataGetBySpider2/one'#/media/liang/Data/project/YFzhongxin/dataGetBySpider/one #/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one
+BASIC_FILE='/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one'#/media/liang/Data/project/YFzhongxin/dataGetBySpider/one #/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one
 #这里边几个函数的最后一个变量向来是没什么用的
 
 class ZFile(object):
@@ -60,6 +60,8 @@ class ZFile(object):
 
 def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,forum_pubtimestrimp=None):
     basic_file=BASIC_FILE
+    date_time=str(date_time)
+
     print date_time
     if '-' in date_time and ' ' in date_time:#u'1498141405'这里的两个if是时间戳
         timeArray=time.strptime(date_time,'%Y-%m-%d %H:%M:%S')
@@ -101,6 +103,7 @@ def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,foru
 
 def Save_org_file(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,forum_pubtimestrimp=None):
     basic_file = BASIC_FILE
+    date_time=str(date_time)
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
         timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
         date_time_strip = str(int(time.mktime(timeArray)))
@@ -142,6 +145,7 @@ def Save_org_file(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,fo
 
 
 def Save_zip(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimestrimp=None):
+    date_time=str(date_time)
 
     basic_file = BASIC_FILE
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
@@ -203,6 +207,8 @@ def Save_zip(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimestri
 
 def Exam_exist(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimestrimp=None):#因为要放在middle中,所以在这里应该只处理url就好,因为很多时候request中不包含meta中的某些东西.
     basic_file = BASIC_FILE
+    date_time=str(date_time)
+
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
         timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
         date_time_strip = str(int(time.mktime(timeArray)))

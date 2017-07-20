@@ -36,6 +36,8 @@ class xilu(scrapy.Spider):
                 yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":"50"}},headers=headers,meta={'plant_form':'None'})
 
     def deal_index(self, response):
+        print response.body
+
         json_charge=json.loads(response.body)
         if not json_charge:
             return

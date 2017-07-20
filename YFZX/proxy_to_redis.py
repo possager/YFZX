@@ -23,13 +23,14 @@ def get_Proxy():
             redis1.lpush('999',proxyip)
     get_proxy_to_redis()
     while True:
-        while redis1.llen('999') < 200:
-            time.sleep(random.randint(5,8))
+        while redis1.llen('999') < 1000:
+            time.sleep(random.randint(3,5))
             get_proxy_to_redis()
 
 
 
 def get_proxy_from_redis():
+    # return redis1.hget()
     return redis1.rpop('999')
 
 def test_proxy():
