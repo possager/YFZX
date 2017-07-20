@@ -17,7 +17,6 @@ import coding
 import hashlib
 
 
-
 class souhunews(scrapy.Spider):
     name = 'sohu'
     headers = {
@@ -29,7 +28,8 @@ class souhunews(scrapy.Spider):
                     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
                 }
         # urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']#'http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=9&size=20'
-        urls=['http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=1&size=20']
+        urls=['http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=1&size=20',
+              'https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
         for url in urls:
             yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
 
@@ -42,12 +42,6 @@ class souhunews(scrapy.Spider):
         datajson=json.loads(response.body)
         # print datajson
         for i in datajson['data']['news']:
-            # print i['medium_title']#标题
-            # print i['view_count']#阅读量
-            # print i['media']#发布人
-            # print i['created_time']#发布时间
-            # print i['comment_count']
-            # print i['id']
             yield scrapy.Request(url='https://m.sohu.com/'+str(i['type'])+'/'+str(i['id']),meta={'publish_user':i['media'],
                                                                                                  'title':i['medium_title'],
                                                                                                  'read_count':int(i['view_count']),
@@ -75,19 +69,27 @@ class souhunews(scrapy.Spider):
 
     def deal_index2(self,response):
         data_json=json.loads(response.body)
+        if not data_json:
+            return
         for data_in_json in data_json:
             publish_user=data_in_json['authorName']
             title=data_in_json['title']
             id=data_in_json['id']
             publish_user_id=data_in_json['authorId']
             publish_time=data_in_json['publicTime']
+            publish_time=int(publish_time) / 1000
+
+            time_format = '%Y-%m-%d'
+            publish_time_stamp_9 = time.localtime(float(publish_time))
+            publish_time = time.strftime(time_format, publish_time_stamp_9)
+
             urlnext='http://m.sohu.com/a/'+str(id)+'_'+str(publish_user_id)
             yield scrapy.Request(url=urlnext,headers=self.headers,meta={'data':{
                 'publish_user':publish_user,
                 'title':title,
                 'id':id,
                 'publish_user_id':publish_user_id,
-                'publish_time':int(publish_time)/1000
+                'publish_time':publish_time
             },
             'plant_form':'sohu',
             'publish_time':publish_time,
@@ -95,7 +97,8 @@ class souhunews(scrapy.Spider):
             'publish_user':publish_user,
             'title':title})
         url_this_index=response.url.split('page=')
-        url_next_index=url_this_index[0]+'page='+str(int(url_this_index[1].split('&')[0]+1))+'&size=20'
+        url_next_index=url_this_index[0]+'page='+str(int(url_this_index[1].split('&')[0])+1)+'&size=20'
+        print url_next_index
         yield scrapy.Request(url=url_next_index,headers=self.headers,meta={'plant_form':'None'})
 
 
@@ -151,6 +154,9 @@ class souhunews(scrapy.Spider):
         data['publish_user']=publish_user
         data['url']=url
         data['title']=title
+
+
+
         data['publish_time']=publish_time
         data['read_count']=read_count
         data['spider_time']=spider_time
@@ -182,18 +188,25 @@ class souhunews(scrapy.Spider):
 
     def deal_content2(self,response):
         # print response.url
+        Save_org_file(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+                      newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
+        Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+                 newsidOrtid=response.meta['id'], datatype='news')
+
+
         data_TCPI=gather_all_funtion.get_result_you_need(response)
         content=data_TCPI[1]
         # publish_time=data_TCPI[2]
         img_urls=data_TCPI[3]
-        time_format = '%Y-%m-%d'
-        spider_time = time.strftime(time_format, time.localtime())
-        publish_time=time.strftime(time_format,time.localtime(float(response.meta['publish_time'])))
+        # time_format = '%Y-%m-%d'
+        # spider_time = time.strftime(time_format, time.localtime())
+        # publish_time=time.strftime(time_format,time.localtime(float(response.meta['publish_time'])))
 
         # print response.body
         data=response.meta['data']
         data['content']=content
         data['reply_nodes']=[]
+        data['img_urls']=img_urls
 
 
 

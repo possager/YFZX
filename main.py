@@ -84,7 +84,7 @@ def run_processSpider(crawl_queue):
 
 
 if __name__ == '__main__':
-    spider_name_list=['sohu']
+    spider_name_list=['xilu']
     # run_multprocess(spider_name_list)
     # run_multprocess2()
 
