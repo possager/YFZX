@@ -18,4 +18,10 @@ headers = {
 data_response=session1.request(method='post',url='http://m.xilu.com/index.html',params={'page':'2'},headers=headers)
 
 print data_response.text
-print json.loads(data_response.text)
+print json.dumps(data_response.text)
+
+
+# reslut= json.loads(json.loads(json.dumps(data_response.text)))
+# for url in reslut:
+#     print url
+

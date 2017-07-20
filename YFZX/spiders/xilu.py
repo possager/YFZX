@@ -10,10 +10,10 @@ from YFZX import persionalSetting
 class xilu(scrapy.Spider):
     name = 'xilu'
     urls=[
-          'http://m.xilu.com/index.html',
+          # 'http://m.xilu.com/index.html',
           # 'http://m.xilu.com/list_1353.html',
           # 'http://m.xilu.com/list_1283.html',
-          # 'http://m.xilu.com/list_1311.html',
+          'http://m.xilu.com/list_1311.html',
           # 'http://m.xilu.com/list_1142.html',
           # 'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
           # 'http://m.xilu.com/list_1469.html'
