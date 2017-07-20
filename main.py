@@ -83,7 +83,7 @@ def run_processSpider(crawl_queue):
 
 
 if __name__ == '__main__':
-    spider_name_list=['xinhuanet']
+    spider_name_list=['newssc']
     # run_multprocess(spider_name_list)
     # run_multprocess2()
 

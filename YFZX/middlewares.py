@@ -108,20 +108,20 @@ class responseToWhereMiddleware(object):
 
 
         print request.url
-        if 'http://www.newssc.org/' == request.url:
-            request.callback=spider.parse_newssc
+        if 'newssc' in request.url:
+            if 'http://www.newssc.org/' == request.url:
+                request.callback=spider.deal_index_from_webpage
+            elif 'newssc.org' in request.url:
 
-        elif 'newssc.org' in request.url:
+                url_otherHomepage = Re_pattern_newssc_index.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
+                url_News = Re_pattern_newssc_news.findall(string=request.url)
 
-            url_otherHomepage = Re_pattern_newssc_index.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
-            url_News = Re_pattern_newssc_news.findall(string=request.url)
-
-            if url_otherHomepage:
-                request.callback = spider.parse_newssc_news_detail
-            elif url_News:
-                request.callback = spider.parse_newssc_news_index
-            else:
-                raise IgnoreRequest
+                if url_otherHomepage:
+                    request.callback = spider.deal_content_from_news
+                elif url_News:
+                    request.callback = spider.deal_content_from_news
+                else:
+                    raise IgnoreRequest
 
 
 

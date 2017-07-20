@@ -39,7 +39,7 @@ def creat_url_list_in_redis():
 
     }
     for i in dict1.iteritems():
-        redis1.set(str(i[1]+i[1]),1)
+        redis1.set(i[1]+i[1],1)
     # redis1.set(plant_form,1)
 
 
