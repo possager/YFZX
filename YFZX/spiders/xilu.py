@@ -5,23 +5,23 @@ import json
 import time
 from YFZX import gather_all_funtion
 from YFZX import persionalSetting
-
+#这个网站在对应板块的url被访问完的时候，会返回空的列表[]
 
 class xilu(scrapy.Spider):
     name = 'xilu'
     urls=[
           'http://m.xilu.com/index.html',
           'http://m.xilu.com/list_1353.html',
-          # 'http://m.xilu.com/list_1283.html',
-          # 'http://m.xilu.com/list_1311.html',
-          # 'http://m.xilu.com/list_1142.html',
-          # 'http://m.xilu.com/list_1412.html',
-          # 'http://m.xilu.com/list_1469.html'
+          'http://m.xilu.com/list_1283.html',
+          'http://m.xilu.com/list_1311.html',
+          'http://m.xilu.com/list_1142.html',
+          # 'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
+          'http://m.xilu.com/list_1469.html'
           ]
     def start_requests(self):
         headers = {
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
-            'X-Requested-With':'XMLHttpRequest',
+            'X-Requested-With':'XMLHttpRequest',#重要
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding':'gzip, deflate, sdch',
             'Accept-Language':'zh-CN,zh;q=0.8',
@@ -32,9 +32,13 @@ class xilu(scrapy.Spider):
 
         }
         for url_to_visit in self.urls:
-            yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":"4"}},headers=headers,meta={'plant_form':'None'})
+            for i in range(0,100):
+                yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":"50"}},headers=headers,meta={'plant_form':'None'})
 
     def deal_index(self, response):
+        json_charge=json.loads(response.body)
+        if not json_charge:
+            return
 
         if response.request.cookies:
             cookies = response.request.cookies
@@ -50,9 +54,6 @@ class xilu(scrapy.Spider):
                     cookies[cookies_name[0]] = cookies_name[1]
                 else:
                     headers[headers_key] = response.headers[headers_key]
-
-
-
 
 
         print response.body

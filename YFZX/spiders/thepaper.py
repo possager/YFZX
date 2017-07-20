@@ -17,11 +17,11 @@ class thepaper(scrapy.Spider):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
             'Referer':'http://m.xilu.com/index.html',
-        'Origin':'http://m.xilu.com',
-        'Host':'m.xilu.com',
+            'Origin':'http://m.xilu.com',
+            'Host':'m.xilu.com',
         }
         for url_to_visit in self.urls:
-            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={})
+            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={'plant_form':'thepaper'})
 
     def deal_index(self,response):
         if response.request.cookies:

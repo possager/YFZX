@@ -4,8 +4,11 @@ import re
 import time
 import scrapy
 from YFZX.persionalSetting import Save_result
+from YFZX.persionalSetting import Save_org_file
+from YFZX.persionalSetting import Save_zip
 
 #这个爬虫这里的论坛没有写完.新华网站的论坛有很多内容,到时候在想一下怎么处理!!!!
+#7-19日发现里边的nid数字并不是固定不变的，而是变化的
 
 class xinhuanet(scrapy.Spider):
     name = 'xinhuanet'
@@ -21,7 +24,7 @@ class xinhuanet(scrapy.Spider):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
         for url in self.urls:
-            yield scrapy.Request(url=url,headers=headers,cookies={})
+            yield scrapy.Request(url=url,headers=headers,cookies={},meta={'plant_form':'None'})
 
 
 
@@ -45,7 +48,11 @@ class xinhuanet(scrapy.Spider):
         response_body= response.body.replace('(','').replace(')','')
 
         datajson_index=json.loads(response_body)
-        datajson_index_data_list=datajson_index['data']['list']
+        try:
+            datajson_index_data_list=datajson_index['data']['list']
+        except Exception as e:
+            print e
+            return
         for one_index in datajson_index_data_list:
             # nodeid=one_index['NodeId']
             id= one_index['DocID']#id
@@ -61,12 +68,19 @@ class xinhuanet(scrapy.Spider):
                 'publish_time':publish_time,
                 'publish_user':publish_user,
                 'content':'',#很多内容在这里没有填.后边补充
-                'reply_nodes':[]
+                'reply_nodes':[],
+                # 'plant_form':'xinhuanet'
 }
-            thismeta={'data':thisindex}
+            thismeta={'data':thisindex,
+                      'plant_form':'xinhuanet'}
             yield scrapy.Request(url=url, headers=headers, cookies=cookies,meta=thismeta)
 
     def deal_content(self,response):
+        Save_org_file(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
+        Save_zip(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news')
+
+
+
         if response.request.cookies:
             cookies=response.request.cookies
         else:
@@ -117,6 +131,7 @@ class xinhuanet(scrapy.Spider):
 
 
         thismeta=response.meta
+        thismeta['plant_form']='None'
         thismeta_data=thismeta['data']
         thismeta_data['img_urls']=img_urls
         thismeta_data['content']=content

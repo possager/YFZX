@@ -18,7 +18,9 @@ def get_Proxy():
         webdata=session1.request(method='GET',url='http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1')
         data_json=json.loads(webdata.text)
         for proxyip in data_json['data']['proxy_list']:
-            redis1.rpush('999',proxyip)
+            print proxyip
+            # redis1.rpush('999',proxyip)
+            redis1.lpush('999',proxyip)
     get_proxy_to_redis()
     while True:
         while redis1.llen('999') < 200:

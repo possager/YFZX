@@ -65,7 +65,7 @@ def run_multprocess2(crawl_queue=None):
 
 def run_processSpider(crawl_queue):
     subprocess_list=[]
-    spider_path = '/media/liang/3804CCCA04CC8C76/project/YFzhongxin/YFZX/YFZX/spiders'
+    spider_path = 'F:/project/YFzhongxin/YFZX/YFZX/spiders'#/media/liang/3804CCCA04CC8C76/project/YFzhongxin/YFZX/YFZX/spiders
     os.chdir(spider_path)
     while subprocess_list or crawl_queue:
         for subprocess_child in subprocess_list:
@@ -83,7 +83,7 @@ def run_processSpider(crawl_queue):
 
 
 if __name__ == '__main__':
-    spider_name_list=['mycdqq','sohu']
+    spider_name_list=['xinhuanet']
     # run_multprocess(spider_name_list)
     # run_multprocess2()
 

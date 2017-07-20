@@ -1,6 +1,5 @@
 #_*_coding:utf-8_*_
 import scrapy
-import pymongo
 import json
 import time
 import re
@@ -19,40 +18,22 @@ import hashlib
 
 
 class souhunews(scrapy.Spider):
-    # name = 'sohu'
-
-    # def start_request(self):
-    #     urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
-    #     headers = {
-    #         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
-    #         # 'Accept': 'application/json',
-    #         # 'Accept-Encoding': 'gzip, deflate, sdch',
-    #         # 'Accept-Language': 'zh-CN,zh;q=0.8',
-    #         # 'Connection': 'keep-alive',
-    #         # 'X-Requested-With': 'XMLHttpRequest'  # 关键,没有这个会出现请求过期
-    #     }
-    #     for url in urls:
-    #         yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
     name = 'sohu'
 
     def start_requests(self):
         headers = {
                     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
-            #         # 'Accept': 'application/json',
-            #         # 'Accept-Encoding': 'gzip, deflate, sdch',
-            #         # 'Accept-Language': 'zh-CN,zh;q=0.8',
-            #         # 'Connection': 'keep-alive',
-            #         # 'X-Requested-With': 'XMLHttpRequest'  # 关键,没有这个会出现请求过期
                 }
         urls = ['https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
         for url in urls:
+            print 'test'
             yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
 
-    def parse(self, response):
-        print response.body
+    # def parse(self, response):
+    #     print response.body
 
 
-    def parse(self, response):
+    def deal_index(self, response):
         print chardet.detect(response.body)
         datajson=json.loads(response.body)
         # print datajson
@@ -75,12 +56,18 @@ class souhunews(scrapy.Spider):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36',
         }
-        urlnext='https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1'
+        # urlnext='https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1'
+        urlnext=response.url
         urldeal1=urlnext.split('s=')[0]
+
         urldealnum=urlnext.split('s=')[1].split('&')[0]
+        print urldealnum
         urldeal3=urlnext.split('s=')[1].split('&')[1]
         if int(urldealnum)<950:
-            yield scrapy.Request(url=urldeal1+str(int(urldealnum)+2)+urldeal3+'&dc=1',headers=headers,meta={'plant_form':'None'})
+            urlnext=urldeal1+'s='+str(int(urldealnum)+1)+'&'+urldeal3+'&dc=1'
+            yield scrapy.Request(url=urlnext,headers=headers,meta={'plant_form':'None'})
+            print 'sucessfully yield----',urlnext
+
 
     def SomeOneNewsDeal(self,response):
         # try:
@@ -275,5 +262,5 @@ class souhunews(scrapy.Spider):
             # Save_zip(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['newsid'],datatype='news')
         print '----------------------------------------'
 
-    def close(spider, reason):
-        raise CloseSpider('nothing')
+    # def close(spider, reason):
+    #     raise CloseSpider('nothing')

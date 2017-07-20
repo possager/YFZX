@@ -8,21 +8,21 @@ redis1=redis.Redis(connection_pool=redis_connect_pool)
 
 def change(key):
     dict1={
-        'sohu':'1',
-        'newssc':'2',
-        'xilu':'3',
-        'chengdu':'4',
-        'taihainet':'5',
-        'toutiao':'6',
-        'xinhuanet':'7',
-        'thepaper':'8',
-        'mycd_qq':'9',
+        'sohu':1,
+        'newssc':2,
+        'xilu':3,
+        'chengdu':4,
+        'taihainet':5,
+        'toutiao':6,
+        'xinhuanet':7,
+        'thepaper':8,
+        'mycd_qq':9,
 
     }
     try:
         return dict1[key]
     except:
-        return '100'
+        return 100
 
 def creat_url_list_in_redis():
     dict1 = {

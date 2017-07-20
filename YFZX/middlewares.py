@@ -10,7 +10,7 @@ from YFZX.persionalSetting import Exam_exist
 import scrapy
 from scrapy.exceptions import CloseSpider
 from YFZX.proxy_to_redis import get_proxy_from_redis
-# from YFZX.examing_redis import
+from YFZX.examing_redis import change
 # import threading
 
 
@@ -71,28 +71,30 @@ class YfzxSpiderMiddleware(object):
 
 class responseToWhereMiddleware(object):
     def process_request(self, request, spider):
+
+
+        #添加的判断是否重复功能的模块
         if request.meta['plant_form']!='None':
             url_request=request.url
             hash_url=str(hashlib.md5(url_request).hexdigest())
             thisclass=path_to_redis()
             num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
             num_exist= thisclass.redis.get(str(request.meta['plant_form']+request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
+            print num_exist
             if num_exist is not None and int(num_exist)>100:
-                print 'num_exist-------------------',num_exist
                 # raise CloseSpider()
                 # return IgnoreRequest
-                thisclass.redis.set(str(request.meta['plant_form']+request.meta['plant_form']),0)
-                request.callback=spider.close
-                return request
-
-
+                num_plant_form = change(request.meta['plant_form'])
+                thisclass.redis.set(num_plant_form+num_plant_form,0)
+                raise CloseSpider()
+                # request.callback=spider.close
+                # return request
             if num_result==0:
-
-
-                thisclass.redis.incr(str(request.meta['plant_form']+request.meta['plant_form']))
-                num_exist = thisclass.redis.get(str(request.meta['plant_form'] + request.meta['plant_form']))
+                num_plant_form = change(request.meta['plant_form'])
+                thisclass.redis.incr(num_plant_form+num_plant_form)
+                num_exist = thisclass.redis.get(num_plant_form+num_plant_form)
+                print request.url,'has been crawled'
                 raise IgnoreRequest()#已经爬去过了
-
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         Re_pattern_newssc_news = re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -123,31 +125,11 @@ class responseToWhereMiddleware(object):
 
 
 
-
-
-
-# class toWhichParseMiddleware(object):
-#     def process_request(self, request, spider):
-#         Re_pattern_newssc_index=re.compile(r'\bhttp://.*?\.newssc\.org/\B')#不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
-#         Re_pattern_newssc_news=re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
-#         url_otherHomepage = Re_pattern_newssc_news.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
-#         url_News = Re_pattern_newssc_news.findall(string=request.url)
-#         if url_otherHomepage:
-#             request.callback=spider.parse_newssc_news_detail
-#         elif url_News:
-#             request.callback=spider.parse_newssc_news_index
-
         elif 'wap.chengdu.cn' in request.url:
             request.callback=spider.deal_content
-        # elif 'chengdu.cn' in request.url:
-
-            # request.callback=spider.parse_chengdu_news_detail
-
-
-        # elif 'api.m.sohu.com/autonews' in request.url:
         elif 'sohu.com' in request.url:
             if 'api.m.sohu.com' in request.url:
-                request.callback=spider.parse
+                request.callback=spider.deal_index
             elif Re_pattern_sohudetail.findall(request.url):
                 request.callback=spider.SomeOneNewsDeal
             elif 'm.sohu.com/reply/api/comment/list/cursor?newsId' in request.url:
@@ -166,8 +148,10 @@ class responseToWhereMiddleware(object):
                 request.callback=spider.deal_content
             elif 'http://www.toutiao.com/api/comment/list/?group_id=' in request.url:
                 request.callback=spider.deal_comment
-        elif 'qc.wa.news.cn' in request.url or 'news.xinhuanet.com' in request.url or 'http://comment.home.news.cn/a/newsCommAll.do?_ksTS=' in request.url:
+        elif 'wa.news.cn' in request.url or 'xinhuanet' in request.url or 'news.xinhuanet.com' in request.url or 'http://comment.home.news.cn/a/newsCommAll.do?_ksTS=' in request.url:
             Re_result=Re_pattern_xinhuanet_content.findall(request.url)
+            # if Re_result:
+            #     request.callback=spider.deal_content
             if '//qc.wa.news.cn/nodeart/list?nid=' in request.url:
                 request.callback=spider.deal_index
             elif Re_pattern_xinhuanet_content.findall(request.url):
@@ -191,6 +175,8 @@ class responseToWhereMiddleware(object):
                 request.callback=spider.deal_index
             elif 'http://m.xilu.com/v/' in request.url:
                 request.callback=spider.deal_content
+        # elif 'xinhuanet' in request.url:
+        #     if
         else:
             print '#########################################################################'
             print '          W      R     O      N      G      IN     middleware'
@@ -198,16 +184,10 @@ class responseToWhereMiddleware(object):
             print '#########################################################################'
 
 
-# class useProxyMiddleware(object):
-#     def process_request(self, request, spider):
-#         # is_Exisit=Exam_exist()
-#         request.headers[]
-
-
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
         # thread1=threading.Thread(target=)
-        if 'sohu.com' not in request.url:
+        if 'sohu' not in request.url:
             try:
                 proxy_ip='http://'+get_proxy_from_redis()
                 request.meta['proxy']=proxy_ip
@@ -218,5 +198,5 @@ class HttpProxyMiddleware(object):
 
 class refuseMiddleware(object):
     def process_spider_input(self,response,spider):
-        if response.status in [400,403]:#这里还缺少一个url被404的次数
+        if response.status in [400,403,404]:#这里还缺少一个url被404的次数
             return response.request

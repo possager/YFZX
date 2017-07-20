@@ -5,6 +5,7 @@ import json
 import time
 from YFZX.persionalSetting import Save_result
 from YFZX.persionalSetting import Save_org_file
+from YFZX.gather_all_funtion import get_result_you_need
 
 
 
@@ -39,7 +40,7 @@ class chinadaily(scrapy.Spider):
         ]
         headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
         for url in urls:
-            yield scrapy.Request(url=url,headers=headers,cookies={})
+            yield scrapy.Request(url=url,headers=headers,cookies={},meta={'plant_form':'toutiao'})
 
 
 
@@ -116,6 +117,16 @@ class chinadaily(scrapy.Spider):
                 else:
                     headers[headers_key]=response.headers[headers_key]
         thismeta=response.meta
+        #----------------------------7-19日添加的内容处理模块
+        data_TCPI=get_result_you_need(response)
+        content=data_TCPI[1]
+        img_urls=data_TCPI[3]
+        publish_time=data_TCPI[2]
+
+
+
+
+
 
         data={
             'id':thismeta['id'],
@@ -125,10 +136,10 @@ class chinadaily(scrapy.Spider):
             'publish_user':thismeta['publish_user'],
             'spider_time':thismeta['spider_time'],
             'publish_user_photo':thismeta['publish_user_photo'],
-            'content':'',
+            'content':content,
             'img_urls':[],
             'video_urls':[],
-            'publish_time':'',
+            'publish_time':publish_time,
             'reply_nodes':[],
         }
 
@@ -147,21 +158,21 @@ class chinadaily(scrapy.Spider):
 
 
             #下边都是处理转到对应的评论所需要的信息.
-            # Re_content_item_id=re.compile(r'item_id: \'.*?\'')
-            # Re_content_qid=re.compile(r'qid : \".*?\"')
-            # # print response.body#普通的html文档
-            # item_id_re=Re_content_item_id.findall(response.body)
-            # print item_id_re
-            # if not item_id_re:
-            #     qid_re =Re_content_qid.findall(response.body)
-            #     print qid_re[0].split('"')[1]#这里的作用是找出文中对应的id部分.
-            #     # yield scrapy.Request()
-            # else:
-            #     print item_id_re[0].split("'")[1]
-            #     thisurl=response.url.split('com/a')
-            #     #http://www.toutiao.com/api/comment/list/?group_id=
-            #     nexturl='http://www.toutiao.com/api/comment/list/?group_id='+thisurl[1].replace('/','')+'&item_id='+str(item_id_re[0].split("'")[1])+'&offset=0&count=20'
-            #     yield scrapy.Request(url=nexturl,cookies=cookies,headers=headers,meta={'data':data})
+            Re_content_item_id=re.compile(r'item_id: \'.*?\'')
+            Re_content_qid=re.compile(r'qid : \".*?\"')
+            # print response.body#普通的html文档
+            item_id_re=Re_content_item_id.findall(response.body)
+            print item_id_re
+            if not item_id_re:
+                qid_re =Re_content_qid.findall(response.body)
+                print qid_re[0].split('"')[1]#这里的作用是找出文中对应的id部分.
+                # yield scrapy.Request()
+            else:
+                print item_id_re[0].split("'")[1]
+                thisurl=response.url.split('com/a')
+                #http://www.toutiao.com/api/comment/list/?group_id=
+                nexturl='http://www.toutiao.com/api/comment/list/?group_id='+thisurl[1].replace('/','')+'&item_id='+str(item_id_re[0].split("'")[1])+'&offset=0&count=20'
+                yield scrapy.Request(url=nexturl,cookies=cookies,headers=headers,meta={'data':data})
 
 
     def deal_comment(self,response):
