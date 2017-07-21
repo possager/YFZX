@@ -6,7 +6,24 @@ import json
 import logging
 import json
 from YFZX import gather_all_funtion
+from YFZX.persionalSetting import Save_zip
+from YFZX.persionalSetting import Save_org_file
+from YFZX.persionalSetting import Save_result
+from YFZX import deal_response
+
 import time
+
+
+import pickle
+import pymongo
+
+client=pymongo.MongoClient('loaclhost',27017)
+COL_dict=client['xpath_dict']
+COL_class=client['xpath_class']
+DOC_dict=COL_dict['chengdu']
+DOC_class=COL_class['chengdu']
+
+
 
 
 
@@ -14,13 +31,17 @@ class newssc(scrapy.Spider):
     name = 'chengdu'
     urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603
 
-
-    # def parse(self,response):
-    #     print 'In parse default'
     def start_requests(self):
         for url in self.urls:
             yield scrapy.Request(url=url,meta={'plant_form':'chengdu'})
     def deal_content(self, response):
+        ##############################################  7-21  ##################
+        content_dict,content_class=deal_response.deal_response(response)
+        DOC_class.insert(content_dict)
+
+        ##############################################  7-21  ##################
+
+
 
         # Re_pattern_index=re.compile(r'\bhttp://.*?\.newssc\.org/\B')#不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         # Re_pattern_news=re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -55,13 +76,27 @@ class newssc(scrapy.Spider):
                 else:
                     headers[headers_key] = response.headers[headers_key]
 
+
+        # try:
+        #     publish_time=response.xpath('/html/body/div[4]/div[2]/p/span[4]').extract()[0]+':00'
+        # except:
+        #     print 'time wrong'
         data_TCPI=gather_all_funtion.get_result_you_need(response)
         title=data_TCPI[0]
         content=data_TCPI[1]
-        publish_time=data_TCPI[2]
+        # publish_time=data_TCPI[2]
         img_urls=data_TCPI[3]
-        time_format = '’%Y-%m-%d %X'
+        time_format = '%Y-%m-%d'
         spider_time = time.strftime(time_format, time.localtime())
+
+        try:
+            publish_time=response.xpath('/html/body/div[4]/div[2]/p/span[4]')
+            print publish_time
+        except Exception as e:
+            print e
+            print 'time wrong'
+            publish_time=data_TCPI[2]
+
         id=str(response.url.split('/')[-1])
         data={
             'url':response.url,
@@ -73,6 +108,9 @@ class newssc(scrapy.Spider):
             'spider_time':spider_time,
             'reply_node':[]
         }
+        Save_org_file(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=response.body)
+        Save_zip(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news')
+        Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
         print data
 
 

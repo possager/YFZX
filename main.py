@@ -84,11 +84,11 @@ def run_processSpider(crawl_queue):
 
 
 if __name__ == '__main__':
-    spider_name_list=['xilu']
+    # spider_name_list=['xilu']
     # run_multprocess(spider_name_list)
     # run_multprocess2()
 
 
-    run_processSpider(spider_name_list)
+    # run_processSpider(spider_name_list)
 
-    # cmdline.execute('scrapy crawl sohu'.split())
+    cmdline.execute('scrapy crawl teststructure'.split())

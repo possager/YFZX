@@ -11,7 +11,7 @@ def find_time(referenceBlock_str):
     Re_find_time_taoge2 = re.compile(
         r'\d{4}?([年|\/|\/|\.|\s|\-]*?)\d{1,2}([月|\/|\/|\.|\s|\-]*?)\d{1,2}([日|\/|\/|\.|\s|\-]*?)\s*?\d{1,2}([\:|时|\-]*?)\d{1,2}([\:|分|\-]*?)\d{1,2}([\:|秒|\-]?)')
     try:
-        publish_time = Re_find_time_taoge2.search(referenceBlock_str).group()
+        publish_time = Re_find_time_taoge2.search(referenceBlock_str).group().replace('/','-')
     except:
         publish_time='2211-11-11 11:11:11'
     return publish_time

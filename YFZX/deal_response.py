@@ -17,15 +17,28 @@ def deal_response(response):
         # 3,content,
 
         fatherstructure_class.content = fatherfunc.xpath('%s[%d]/text()' % (xpathfunc, numfunc)).extract()
-        fatherstructure_class.len_this_tag=len(fatherfunc.xpath('%s[%d]' % (xpathfunc, numfunc)).extract())
+        this_div_content=fatherfunc.xpath('%s[%d]' % (xpathfunc, numfunc)).extract()
+        if this_div_content:
+            fatherstructure_class.len_this_tag=len(this_div_content[0])
         thischild = fatherfunc.xpath('%s[%d]/child::node()' % (xpathfunc, numfunc))
         has_url = fatherfunc.xpath('%s[%d]/@href' % (xpathfunc, numfunc)).extract()
+
+
+        ############################ 7-21 #################################
+        classname=fatherfunc.xpath('%s[%d]/@class' % (xpathfunc, numfunc)).extract()
+        if classname:
+            fatherstructure_class.classname=classname.pop()
+        fatherstructure_class.xpath_num=len(fatherstructure_class.xpath.split('/'))
+
+        ############################ 7-21 #################################
+
         if has_url:
             fatherstructure_class.has_url = 1
 
 
-        #因为要用到father的基本信息,所以在这里来实现
-        #-----------------------------------------------------------------从myPageStrcture中的Init方法中拷贝过来的.
+
+        # 因为要用到father的基本信息,所以在这里来实现
+        # -----------------------------------------------------------------从myPageStrcture中的Init方法中拷贝过来的.
         content = ''
         for tl in fatherstructure_class.content:
             tl = tl.replace(u' ', '').replace('\t', '').replace('\n', '')
@@ -53,33 +66,8 @@ def deal_response(response):
                 lenth += 0
         fatherstructure_class.TAL = lenth  # 这个指标被我给改变了,是我自定义的一个指标
         fatherstructure_class.ND=len(fatherstructure_class.xpath.split('/'))
-
-        #------------------------------------------------------------------
-
-
-        #-------------------------------------------------------------------
         #添加数据格式化处理模块
-        try:
-            xpathdoc_one={
-                # 'PL':fatherstructure_class.PN,
-                'TL':fatherstructure_class.TL,
-                'name':fatherstructure_class.name,
-                'num':fatherstructure_class.num,
-                'xpath':fatherstructure_class.xpath,
-                'content':content.replace('"','_+_'),
-                'PN':fatherstructure_class.PN,
-                'ND':fatherstructure_class.ND,
-                'TAL':fatherstructure_class.TAL,
-                'TP':fatherstructure_class.TP,
-                'has_url':fatherstructure_class.has_url,
-                'divnum':fatherstructure_class.divnum
-            }
 
-            thisclass_dict['data'].append(xpathdoc_one)
-
-
-        except Exception as e:
-            pass
 
 
 
@@ -116,11 +104,44 @@ def deal_response(response):
                     tag + '_' + str(num)] = thisclass2  # 这里的tag貌似没有添加下标，可能会出错。#7-6对头,今天发现了tag没有下表,出错了
 
                 div_number += 1  # 这个div_number代表是的当前子节点下所有的子标签数量，前边的num表示的同一个标签的的出现次数
-                if thisclass2.name not in ['style','script','footer']:
+                if (thisclass2.name not in ['style','script','footer']) and (thisclass2.classname not in ['style','script','footer']):
                     getchild(j2, tag, xpath, num, thisclass2)
+                    ##################################################  7-21  ########################################
+                    try:
+                        fatherstructure_class.statistics[tag] += 1
+                    except:
+                        fatherstructure_class.statistics[tag] = 1
+
+                    ##################################################  7-21  #########################################
             except Exception as e:
                 pass
 
+        # fatherstructure_class.statistics[tag]
+
+        ##################################  7-21  #######################################
+        try:
+            xpathdoc_one = {
+                # 'PL':fatherstructure_class.PN,
+                'TL': fatherstructure_class.TL,
+                'name': fatherstructure_class.name,
+                'num': fatherstructure_class.num,
+                'xpath': fatherstructure_class.xpath,
+                'content': content.replace('"', '_+_'),
+                'PN': fatherstructure_class.PN,
+                'ND': fatherstructure_class.ND,
+                'TAL': fatherstructure_class.TAL,
+                'TP': fatherstructure_class.TP,
+                'has_url': fatherstructure_class.has_url,
+                'divnum': fatherstructure_class.divnum,
+                'classname': fatherstructure_class.classname,  # 7-21日添加
+                'statistics':fatherstructure_class.statistics,
+                'len_this_tag':fatherstructure_class.len_this_tag
+            }
+            thisclass_dict['data'].append(xpathdoc_one)
+        except Exception as e:
+            pass
+
+        ##################################  7-21  #######################################
     i1 = response.xpath('/child::node()')
 
     num = 1

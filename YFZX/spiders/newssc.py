@@ -17,7 +17,7 @@ class newssc(scrapy.Spider):
         url_find_by_re_list=Re_find_news_url.findall(response.body)
         print url_find_by_re_list
         for url in url_find_by_re_list:
-            if 'newssc' in url:
+            if 'newssc' in url and '.js' not in url:
                 url_split=url.split('"')[1]
                 yield scrapy.Request(url=url_split,headers=response.headers,meta={'plant_form':'newssc'})
 

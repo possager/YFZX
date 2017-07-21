@@ -105,7 +105,13 @@ def Save_org_file(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,fo
     basic_file = BASIC_FILE
     date_time=str(date_time)
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
-        timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+        try:
+            timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+        except Exception:
+            try:
+                timeArray = time.strftime(date_time+':00','%Y-%m-%d %H:%M:%S')
+            except Exception:
+                print 'wrong in trys try'
         date_time_strip = str(int(time.mktime(timeArray)))
         # print date_time_strip
     elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19):

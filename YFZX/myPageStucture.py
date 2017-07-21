@@ -8,7 +8,7 @@ class pageStructure:
         self.content=None#为标签的文本内容,很多时候这个extract之后是一个列表.
         self.TL=0#文本长度
         self.PN=0#标点符号数量
-        self.ND=0#这个其实没用,表示两个节点间的相对距离,一个节点没什么用,它针对的是两个节点
+        self.ND=0#这个其实没用,表示两个节点间的相对距离,一个节点没什么用,它针对的是两个节点  #7-21目前的统计参数表明与xpath_num相等
         # self.TDTN=0#计集合元素在文本中出现的次数(比如一些特殊符号:可用作时间,@可用作邮箱)
         self.TAL=0#文本中字符的长度
         self.TP='S'#表示节点的属性,如div,tr,td等,与那么属性重合
@@ -19,8 +19,9 @@ class pageStructure:
         self.divnum=1#用来表示这个标签在网页父标签中的顺序.可以用来计算ND
         #7-16日添加
         self.statistics={}#7-16日添加，专门用来统计各个标签出现的次数情况，遍历完了之后也就统计完了
-        self.len_this_tag=0#用来统计这个标签中所有字符的长度
-        self.xpath_num=0#这个指标是用来统计在这个所有的xpath的路径中所有标签出现的次数
+        self.len_this_tag=0#用来统计这个标签中所有字符的长度,一般像带文章内容的标签会稍微长一些,但是有js的时候会不一样
+        self.xpath_num=0#这个指标是用来统计在这个所有的xpath的路径中所有标签出现的次数#7-21已经不太记得这个指标的具体作用了
+        self.classname=None#添加class那么指标,用来过过滤xilu这样的网站
 
 
 

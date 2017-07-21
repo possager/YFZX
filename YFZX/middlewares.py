@@ -196,14 +196,15 @@ class responseToWhereMiddleware(object):
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
         # thread1=threading.Thread(target=)
-        if 'sohu' not in request.url:
-            try:
-                proxy_ip='http://'+get_proxy_from_redis()
-                request.meta['proxy']=proxy_ip
-                print 'set proxy successfully'
-            except Exception as e:
-                print e
-
+        # if 'sohu' not in request.url:
+        #     try:
+        #         proxy_ip='http://'+get_proxy_from_redis()
+        #         request.meta['proxy']=proxy_ip
+        #         print 'set proxy successfully'
+        #     except Exception as e:
+        #         print e
+        #
+        pass
 
 class refuseMiddleware(object):
     def process_spider_input(self,response,spider):

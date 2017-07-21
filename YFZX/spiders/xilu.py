@@ -10,13 +10,13 @@ from YFZX import persionalSetting
 class xilu(scrapy.Spider):
     name = 'xilu'
     urls=[
-          # 'http://m.xilu.com/index.html',
-          # 'http://m.xilu.com/list_1353.html',
-          # 'http://m.xilu.com/list_1283.html',
+          'http://m.xilu.com/index.html',
+          'http://m.xilu.com/list_1353.html',
+          'http://m.xilu.com/list_1283.html',
           'http://m.xilu.com/list_1311.html',
-          # 'http://m.xilu.com/list_1142.html',
-          # 'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
-          # 'http://m.xilu.com/list_1469.html'
+          'http://m.xilu.com/list_1142.html',
+          'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
+          'http://m.xilu.com/list_1469.html'
           ]
     def start_requests(self):
         headers = {
@@ -33,12 +33,13 @@ class xilu(scrapy.Spider):
         }
         for url_to_visit in self.urls:
             for i in range(0,100):
+                time.sleep(1)
                 yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":str(i)}},headers=headers,meta={'plant_form':'None'})
 
     def deal_index(self, response):
         print response.body
 
-        json_charge=json.loads(response.body)
+        json_charge=json.loads('['+response.body.split('[')[1].split(']')[0]+']')
         if not json_charge:
             return
 
