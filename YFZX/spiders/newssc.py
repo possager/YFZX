@@ -1,6 +1,8 @@
 import scrapy
 import re
 import time
+from YFZX import gather_all_funtion
+
 
 class newssc(scrapy.Spider):
     name = 'newssc'
@@ -15,11 +17,12 @@ class newssc(scrapy.Spider):
     def deal_index_from_webpage(self,response):
         Re_find_news_url=re.compile(r'href=".*?"')
         url_find_by_re_list=Re_find_news_url.findall(response.body)
-        print url_find_by_re_list
+        # print url_find_by_re_list
         for url in url_find_by_re_list:
             if 'newssc' in url and '.js' not in url:
                 url_split=url.split('"')[1]
                 yield scrapy.Request(url=url_split,headers=response.headers,meta={'plant_form':'newssc'})
 
     def deal_content_from_news(self,response):
-        print response.body
+        # print response.body
+        print gather_all_funtion.get_result_you_need(response)

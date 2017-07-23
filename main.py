@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     # run_processSpider(spider_name_list)
 
-    cmdline.execute('scrapy crawl teststructure'.split())
+    cmdline.execute('scrapy crawl chengdu'.split())

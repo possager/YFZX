@@ -10,7 +10,7 @@ from YFZX.persionalSetting import Exam_exist
 import scrapy
 from scrapy.exceptions import CloseSpider
 from YFZX.proxy_to_redis import get_proxy_from_redis
-from YFZX.examing_redis import change
+# from YFZX.examing_redis import change
 # import threading
 
 
@@ -73,28 +73,29 @@ class responseToWhereMiddleware(object):
     def process_request(self, request, spider):
 
 
-        #添加的判断是否重复功能的模块
-        # if request.meta['plant_form']!='None':
-        #     url_request=request.url
-        #     hash_url=str(hashlib.md5(url_request).hexdigest())
-        #     thisclass=path_to_redis()
-        #     num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])
-        #     num_exist= thisclass.redis.get(str(request.meta['plant_form']+request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
-        #     # print num_exist
-        #     if num_exist is not None and int(num_exist)>100:
-        #         # raise CloseSpider()
-        #         # return IgnoreRequest
-        #         num_plant_form = change(request.meta['plant_form'])
-        #         thisclass.redis.set(num_plant_form+num_plant_form,0)
-        #         raise CloseSpider()
-        #         # request.callback=spider.close
-        #         # return request
-        #     if num_result==0:
-        #         num_plant_form = change(request.meta['plant_form'])
-        #         thisclass.redis.incr(num_plant_form+num_plant_form)
-        #         num_exist = thisclass.redis.get(num_plant_form+num_plant_form)
-        #         print request.url,'has been crawled'
-        #         # raise IgnoreRequest()#已经爬去过了
+        #添加的判断是否重复功能的模块,带plant_form的就不需要进行防虫处理，没有的就需要处理
+        if request.meta['plant_form']!='None':
+            url_request=request.url
+            hash_url=str(hashlib.md5(url_request).hexdigest())
+            thisclass=path_to_redis()
+            num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])#防重
+            num_exist= thisclass.redis.get(str(request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
+            # print num_exist
+            if num_exist is not None and int(num_exist)>100:
+                # raise CloseSpider()
+                # return IgnoreRequest
+                num_plant_form = request.meta['plant_form']
+                thisclass.redis.set(num_plant_form+num_plant_form,0)
+                raise CloseSpider()
+                # request.callback=spider.close
+                # return request
+            if num_result==0:
+                # num_plant_form = change(request.meta['plant_form'])
+                num_plant_form=request.meta['plant_form']
+                thisclass.redis.incr(num_plant_form)
+                num_exist = thisclass.redis.get(num_plant_form)
+                print request.url,'has been crawled'
+                # raise IgnoreRequest()#已经爬去过了
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         Re_pattern_newssc_news = re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -107,21 +108,23 @@ class responseToWhereMiddleware(object):
 
 
 
+
+
         print request.url
         if 'newssc' in request.url:
             if 'http://www.newssc.org/' == request.url:
                 request.callback=spider.deal_index_from_webpage
             elif 'newssc.org' in request.url:
 
-                url_otherHomepage = Re_pattern_newssc_index.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
+                # url_otherHomepage = Re_pattern_newssc_index.findall(string=request.url)  # 找出所有不是具体新闻的链接继续跟进访问.
                 url_News = Re_pattern_newssc_news.findall(string=request.url)
 
-                if url_otherHomepage:
-                    request.callback = spider.deal_content_from_news
-                elif url_News:
+                # if url_otherHomepage:
+                #     request.callback = spider.deal_content_from_news
+                if url_News:
                     request.callback = spider.deal_content_from_news
                 else:
-                    raise IgnoreRequest
+                    request.callback=spider.deal_index_from_webpage
 
 
 

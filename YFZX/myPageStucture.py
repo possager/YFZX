@@ -23,6 +23,12 @@ class pageStructure:
         self.xpath_num=0#这个指标是用来统计在这个所有的xpath的路径中所有标签出现的次数#7-21已经不太记得这个指标的具体作用了
         self.classname=None#添加class那么指标,用来过过滤xilu这样的网站
 
+        #7-23日添加
+        self.xpath_x_value=1#这个指标是用当前xpath路径下的xpath_num叠加起来的
+        #7-24日添加
+        self.value_of_div=1
+        self.value_of_div_xpath=1
+
 
 
     def Init(self):

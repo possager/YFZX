@@ -8,6 +8,7 @@ def deal_response(response):
     thisclass = myPageStucture.pageStructure()
     thisclass_dict={
         'data':[],
+        'plant_form':response.meta['plant_form'],
         'url':response.url.replace('.','_')
     }
 
@@ -31,6 +32,17 @@ def deal_response(response):
         fatherstructure_class.xpath_num=len(fatherstructure_class.xpath.split('/'))
 
         ############################ 7-21 #################################
+
+
+        ############################  7-24  ################################
+        # if fatherstructure_class.name in ['div','p','a']:
+        #     fatherstructure_class.value_of_div=3
+        # elif fatherstructure_class.name in ['tr','td']:
+        #     fatherstructure_class.value_of_div=2
+        # else:
+        #     fatherstructure_class.value_of_div=1
+        ############################  7-24  ################################
+
 
         if has_url:
             fatherstructure_class.has_url = 1
@@ -97,6 +109,19 @@ def deal_response(response):
 
 
                 thisclass2.name = tag
+
+                ############################  7-24  ################################
+                if thisclass.name in ['div', 'p', 'a']:
+                    thisclass.value_of_div = 5
+                elif thisclass.name in ['tr', 'td']:
+                    thisclass.value_of_div = 2
+                else:
+                    thisclass.value_of_div = 1
+                thisclass.value_of_div_xpath =fatherstructure_class.value_of_div_xpath+thisclass.value_of_div
+
+                ############################  7-24  ################################
+
+
                 thisclass2.num = num
                 thisclass2.xpath = xpath
                 thisclass2.divnum = div_number
@@ -104,13 +129,40 @@ def deal_response(response):
                     tag + '_' + str(num)] = thisclass2  # 这里的tag貌似没有添加下标，可能会出错。#7-6对头,今天发现了tag没有下表,出错了
 
                 div_number += 1  # 这个div_number代表是的当前子节点下所有的子标签数量，前边的num表示的同一个标签的的出现次数
-                if (thisclass2.name not in ['style','script','footer']) and (thisclass2.classname not in ['style','script','footer']):
+                if (thisclass2.name not in ['style','script','footer']) and (thisclass2.classname not in ['script','footer']):
                     getchild(j2, tag, xpath, num, thisclass2)
                     ##################################################  7-21  ########################################
                     try:
                         fatherstructure_class.statistics[tag] += 1
                     except:
                         fatherstructure_class.statistics[tag] = 1
+                    try:
+                        thisclass.xpath_x_value=fatherstructure_class.xpath_x_value+fatherstructure_class.statistics[tag]#7-23日添加,每一个xpath_x_value代表的是上一个父标签的这个属性值
+                    except Exception as e:
+                        print e
+
+
+                    xpathdoc_one = {
+                        # 'PL':fatherstructure_class.PN,
+                        'TL': fatherstructure_class.TL,
+                        'name': fatherstructure_class.name,
+                        'num': fatherstructure_class.num,
+                        'xpath': fatherstructure_class.xpath,
+                        'content': content.replace('"', '_+_'),
+                        'PN': fatherstructure_class.PN,
+                        'ND': fatherstructure_class.ND,
+                        'TAL': fatherstructure_class.TAL,
+                        'TP': fatherstructure_class.TP,
+                        'has_url': fatherstructure_class.has_url,
+                        'divnum': fatherstructure_class.divnum,
+                        'classname': fatherstructure_class.classname,  # 7-21日添加
+                        'statistics': fatherstructure_class.statistics,
+                        'len_this_tag': fatherstructure_class.len_this_tag,
+                        'xpath_x_value':thisclass.xpath_x_value,
+                        'value_of_div_xpath':thisclass.value_of_div_xpath
+                    }
+                    thisclass_dict['data'].append(xpathdoc_one)
+                    #7-23日添加，因为在下边字典中的话fatherclass的内容就改变了
 
                     ##################################################  7-21  #########################################
             except Exception as e:
@@ -119,27 +171,27 @@ def deal_response(response):
         # fatherstructure_class.statistics[tag]
 
         ##################################  7-21  #######################################
-        try:
-            xpathdoc_one = {
-                # 'PL':fatherstructure_class.PN,
-                'TL': fatherstructure_class.TL,
-                'name': fatherstructure_class.name,
-                'num': fatherstructure_class.num,
-                'xpath': fatherstructure_class.xpath,
-                'content': content.replace('"', '_+_'),
-                'PN': fatherstructure_class.PN,
-                'ND': fatherstructure_class.ND,
-                'TAL': fatherstructure_class.TAL,
-                'TP': fatherstructure_class.TP,
-                'has_url': fatherstructure_class.has_url,
-                'divnum': fatherstructure_class.divnum,
-                'classname': fatherstructure_class.classname,  # 7-21日添加
-                'statistics':fatherstructure_class.statistics,
-                'len_this_tag':fatherstructure_class.len_this_tag
-            }
-            thisclass_dict['data'].append(xpathdoc_one)
-        except Exception as e:
-            pass
+        # try:
+        #     xpathdoc_one = {
+        #         # 'PL':fatherstructure_class.PN,
+        #         'TL': fatherstructure_class.TL,
+        #         'name': fatherstructure_class.name,
+        #         'num': fatherstructure_class.num,
+        #         'xpath': fatherstructure_class.xpath,
+        #         'content': content.replace('"', '_+_'),
+        #         'PN': fatherstructure_class.PN,
+        #         'ND': fatherstructure_class.ND,
+        #         'TAL': fatherstructure_class.TAL,
+        #         'TP': fatherstructure_class.TP,
+        #         'has_url': fatherstructure_class.has_url,
+        #         'divnum': fatherstructure_class.divnum,
+        #         'classname': fatherstructure_class.classname,  # 7-21日添加
+        #         'statistics':fatherstructure_class.statistics,
+        #         'len_this_tag':fatherstructure_class.len_this_tag
+        #     }
+        #     thisclass_dict['data'].append(xpathdoc_one)
+        # except Exception as e:
+        #     pass
 
         ##################################  7-21  #######################################
     i1 = response.xpath('/child::node()')
@@ -161,6 +213,10 @@ def deal_response(response):
             # 所有信息提取完成
 
             thisclass.name = tag
+
+
+
+
             thisclass.content = j1.xpath('/%s/text()' % tag).extract()
             # thisclass.len_this_tag=len(j1.xpath('/%s'%tag).extract())
             thisclass.xpath = xpath

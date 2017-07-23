@@ -29,12 +29,14 @@ DOC_class=COL_class['chengdu']
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603
+    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603#如果超限会返回404错误
 
     def start_requests(self):
         for url in self.urls:
             yield scrapy.Request(url=url,meta={'plant_form':'chengdu'})
     def deal_content(self, response):
+        if response.status > 400:
+            return
         ##############################################  7-21  ##################
         content_dict,content_class=deal_response.deal_response(response)
         DOC_class.insert(content_dict)
