@@ -17,11 +17,11 @@ import time
 import pickle
 import pymongo
 
-client=pymongo.MongoClient('loaclhost',27017)
-COL_dict=client['xpath_dict']
-COL_class=client['xpath_class']
-DOC_dict=COL_dict['chengdu']
-DOC_class=COL_class['chengdu']
+# client=pymongo.MongoClient('loaclhost',27017)
+# COL_dict=client['xpath_dict']
+# COL_class=client['xpath_class']
+# DOC_dict=COL_dict['chengdu']
+# DOC_class=COL_class['chengdu']
 
 
 
@@ -38,8 +38,8 @@ class newssc(scrapy.Spider):
         if response.status > 400:
             return
         ##############################################  7-21  ##################
-        content_dict,content_class=deal_response.deal_response(response)
-        DOC_class.insert(content_dict)
+        # content_dict,content_class=deal_response.deal_response(response)
+        # DOC_class.insert(content_dict)
 
         ##############################################  7-21  ##################
 

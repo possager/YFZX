@@ -100,16 +100,17 @@ def getxpath(response_list):
             return result_dict2[1]
     else:
         if len(result_dict2[0][0].split('/'))>2:#注意，这个想四川新闻王的话不能这么用，因为四川新闻网的不懂地区的网页是不一样的，但是url链接却是一样的，用这个会出问题。
-            save_xpath_redis(result_dict2[0],url=response_list['url'],plant_from=response_list['plant_form'])
+           return save_xpath_redis(result_dict2[0],url=response_list['url'],plant_from=response_list['plant_form'])
             # return result_dict2[0]
         else:
-            save_xpath_redis(result_dict2[1],url=response_list['url'],plant_from=response_list['plant_form'])
+            return save_xpath_redis(result_dict2[1],url=response_list['url'],plant_from=response_list['plant_form'])
 
 
 
 
 def save_xpath_redis(xpath_and_tuple,url,plant_from):#判断plantform要么在传入之前判断，要么在传入之后判断//*[@id="page"]/table/tbody/tr[1]/td/table/tbody/tr/td/div/ul[2]/li/table/tbody/tr[4]/td/p[2]
     xpath=xpath_and_tuple[0]
+    plant_from=plant_from+'_xpaht100'
     # xpath_hash=hashlib.md5(xpath).hexdigest()
     if redis1.llen(plant_from)<100:
         redis1.rpush(plant_from,xpath)
@@ -123,7 +124,7 @@ def save_xpath_redis(xpath_and_tuple,url,plant_from):#判断plantform要么在�
     for key in xpath_set_from_list:
         dict_xpath[key]=xpath_list_from_redis.count(key)
     dict_xpath2=sorted(dict_xpath.iteritems(),key=lambda x:x[1],reverse=True)
-    print dict_xpath2
+    return dict_xpath2
 
 
 
