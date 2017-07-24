@@ -85,7 +85,7 @@ class responseToWhereMiddleware(object):
                 # raise CloseSpider()
                 # return IgnoreRequest
                 num_plant_form = request.meta['plant_form']
-                thisclass.redis.set(num_plant_form+num_plant_form,0)
+                thisclass.redis.set(num_plant_form+'_has_crawled',0)
                 raise CloseSpider()
                 # request.callback=spider.close
                 # return request
@@ -198,15 +198,16 @@ class responseToWhereMiddleware(object):
 
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
-        # thread1=threading.Thread(target=)
         # if 'sohu' not in request.url:
-        #     try:
-        #         proxy_ip='http://'+get_proxy_from_redis()
-        #         request.meta['proxy']=proxy_ip
-        #         print 'set proxy successfully'
-        #     except Exception as e:
-        #         print e
-        #
+        try:
+            proxy_ip='http://'+get_proxy_from_redis()
+            request.meta['proxy']=proxy_ip
+            request.meta['download_timeout']=7
+
+            print 'set proxy successfully'
+        except Exception as e:
+            print e
+
         pass
 
 class refuseMiddleware(object):

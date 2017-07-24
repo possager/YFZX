@@ -6,7 +6,7 @@ from YFZX.proxy_to_redis import redis1
 import os.path
 import os
 from YFZX.persionalSetting import BASIC_FILE
-
+####################有时间会有出现timeout故障
 
 class path_to_redis:
     def __init__(self):
@@ -37,7 +37,7 @@ class path_to_redis:
         # for i in range(self.redis.llen(key2)):
         #     print self.redis.lindex(key2,i)
         hash_url=str(hashlib.md5(url_to_exam).hexdigest())
-        result_num=self.redis.hset(key2+key2,hash_url,1)
+        result_num=self.redis.hset(key2+'_has_crawled',hash_url,1)
         return result_num
 
     def creat_url_list_in_redis(self):#用来存放重复次数是否超过100次的那个列表
@@ -65,5 +65,7 @@ if __name__ == '__main__':
     # result_num=thisclass.examing(url_to_exam='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10',plantform='sohu')
     # print result_num
     # thisclass.examing('baidu.com','sohu')
+
+
     # thisclass.creat_url_list_in_redis()
-    thisclass.examing('baidu.com',1)
+    thisclass.examing('baidu.com','baidu')

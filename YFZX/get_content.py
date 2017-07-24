@@ -124,7 +124,14 @@ def save_xpath_redis(xpath_and_tuple,url,plant_from):#判断plantform要么在�
     for key in xpath_set_from_list:
         dict_xpath[key]=xpath_list_from_redis.count(key)
     dict_xpath2=sorted(dict_xpath.iteritems(),key=lambda x:x[1],reverse=True)
-    return dict_xpath2
+    # return dict_xpath2
+    if len(dict_xpath2[0][0].split('/'))<3:
+        try:
+            return dict_xpath2[1]
+        except Exception as e:
+            print e
+    else:
+        return dict_xpath2[0]
 
 
 

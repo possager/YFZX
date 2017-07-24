@@ -25,4 +25,13 @@ class newssc(scrapy.Spider):
 
     def deal_content_from_news(self,response):
         # print response.body
-        print gather_all_funtion.get_result_you_need(response)
+        data_TCPI= gather_all_funtion.get_result_you_need(response)
+        content=data_TCPI[1]
+        title=data_TCPI[0]
+        publish_time=data_TCPI[2]
+        img_urls=data_TCPI[3]
+
+        print content
+        print title
+        print publish_time
+        print img_urls

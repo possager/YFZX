@@ -18,4 +18,4 @@ redis1=redis.Redis(connection_pool=pool1)
 # print redis1.lrange('one',0,100)
 
 
-print redis1.hset('llde','yixie',1)
+print redis1.hset('newssc_has_crawled','www.baidu.com','2')

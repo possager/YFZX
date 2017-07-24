@@ -48,7 +48,8 @@ class souhunews(scrapy.Spider):
                                                                                                  'publish_time':i['created_time'].replace('T',' '),
                                                                                                  'id':i['id'],
                                                                                                  'original_url':response.url,
-                                                                                                 'plant_form':'sohu'
+                                                                                                 'plant_form':'sohu',
+                                                                                                 'download_timeout':3
                                                                                                  })
 
         headers = {
@@ -63,7 +64,8 @@ class souhunews(scrapy.Spider):
         urldeal3=urlnext.split('s=')[1].split('&')[1]
         if int(urldealnum)<950:
             urlnext=urldeal1+'s='+str(int(urldealnum)+1)+'&'+urldeal3+'&dc=1'
-            yield scrapy.Request(url=urlnext,headers=headers,meta={'plant_form':'None'})
+            yield scrapy.Request(url=urlnext,headers=headers,meta={'plant_form':'None',
+                                                                   'download_timeout':3})
             print 'sucessfully yield----',urlnext
 
 
@@ -95,11 +97,13 @@ class souhunews(scrapy.Spider):
             'publish_time':publish_time,
             'id':id,
             'publish_user':publish_user,
-            'title':title})
+            'title':title,
+            'download_timeout':3})
         url_this_index=response.url.split('page=')
         url_next_index=url_this_index[0]+'page='+str(int(url_this_index[1].split('&')[0])+1)+'&size=20'
         print url_next_index
-        yield scrapy.Request(url=url_next_index,headers=self.headers,meta={'plant_form':'None'})
+        yield scrapy.Request(url=url_next_index,headers=self.headers,meta={'plant_form':'None',
+                                                                           'download_timeout':3})
 
 
     def SomeOneNewsDeal(self,response):
@@ -114,7 +118,7 @@ class souhunews(scrapy.Spider):
         url= response.url
         publish_user= response.meta['publish_user']
         title= response.meta['title']
-        time_format = '’%Y-%m-%d %X'
+        time_format = '’%Y-%m-%d'
         # spider_time = time.strftime(time_format, time.localtime())  # spider_time
         # publish_time = post['pubtime']  # publish_time
         # publish_time= time.strftime(time_format,response.meta['publish_time'])
@@ -134,7 +138,7 @@ class souhunews(scrapy.Spider):
             except Exception as e:
                 print e
                 print 'wrong in get content'
-        time_format='’%Y-%m-%d %X'
+        time_format='’%Y-%m-%d'
         spider_time=time.strftime(time_format,time.localtime())
         # print spider_time
         article= response.xpath('/html/body/section[1]/article').extract()
@@ -183,7 +187,8 @@ class souhunews(scrapy.Spider):
                                                                                                                                                                'img_urls':imgsrclist2,
                                                                                                                                                                'data':data,
                                                                                                                                                                'newsid':newsid,
-                                                                                                                                                               'plant_form':'None'
+                                                                                                                                                               'plant_form':'None',
+                                                                                                                                                               'download_timeout':3,
                                                                                                                                                                })
 
     def deal_content2(self,response):
@@ -222,7 +227,8 @@ class souhunews(scrapy.Spider):
             #https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id=3500748995&page_no=2
             url_to_comments='https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id='+str(comment_id_find_by_re)+'&page_no=2'
             yield scrapy.Request(url=url_to_comments,headers=response.headers,meta={'plant_form':'None',
-                                                                                    'data':data
+                                                                                    'data':data,
+                                                                                    'download_timeout':3
                                                                                     })
         except Exception as e:
             print e
@@ -351,7 +357,8 @@ class souhunews(scrapy.Spider):
         try:
             data_json = json.loads(response.body)
             if data_json['jsonObject']['error_code']:
-                return scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5',meta={'plant_form':'None'})
+                return scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5',meta={'plant_form':'None',
+                                                                                                                                                   'download_timeout':3})
         except Exception as e:
             # yield scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5')
             pass
@@ -411,7 +418,9 @@ class souhunews(scrapy.Spider):
             url_this_comment=response.url.split('page_no=')
             url_next_comment=url_this_comment[0]+'page_no='+str(int(url_this_comment[1].split('&')[0])+1)+'&'+url_this_comment[1].split('&')[1]
             print url_next_comment
-            yield scrapy.Request(url=url_next_comment,meta={'data':data})
+            yield scrapy.Request(url=url_next_comment,meta={'data':data,
+                                                            'plant_form':'None',
+                                                            'download_timeout':3})
         except Exception as e:
             print e
             return

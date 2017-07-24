@@ -1,32 +1,12 @@
 #_*_coding:utf-8_*_
-import random
+
+import redis
 
 
-dict1={}
-for i in range(10):
-    list1=['div','tag','li','name']
-    tag=random.choice(list1)
-    try:
-        dict1[tag]+=1
-    except:
-        dict1[tag]=1
+connectPool=redis.ConnectionPool(host='localhost',port=6379)
+redis1=redis.Redis(connection_pool=connectPool)
 
+# redis1.hset(name='newssc_has_crawled',key='one',value=1)
 
-print dict1
-
-
-
-
-
-
-
-
-
-
-
-
-
-# reslut= json.loads(json.loads(json.dumps(data_response.text)))
-# for url in reslut:
-#     print url
-
+print redis1.hset('newwsc'+'_has_crawled','www.baidu.com',3)
+print redis1.hset('newssc_has_crawled','www.baidu.com','2')

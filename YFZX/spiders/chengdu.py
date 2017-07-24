@@ -10,18 +10,14 @@ from YFZX.persionalSetting import Save_zip
 from YFZX.persionalSetting import Save_org_file
 from YFZX.persionalSetting import Save_result
 from YFZX import deal_response
+from scrapy.exceptions import CloseSpider
 
 import time
 
 
-import pickle
-import pymongo
-
-# client=pymongo.MongoClient('loaclhost',27017)
-# COL_dict=client['xpath_dict']
-# COL_class=client['xpath_class']
-# DOC_dict=COL_dict['chengdu']
-# DOC_class=COL_class['chengdu']
+#####################chengdu这个是是时间处理模块有问题,问题出在在正文模块中找到对应的时间格式的那部分,总是找不准,导致根据时间来存储数据的模块出了问题7-25
+######################这里的redis运作正常,代理运作正常,可以根据需要添加download_timeout参数.
+######################在gettitle的模块中有一个问题,是数组取值的时候出现的.
 
 
 
@@ -29,14 +25,14 @@ import pymongo
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1893603)]#1893603#如果超限会返回404错误
+    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,3000000)]#1893603#如果超限会返回404错误
 
     def start_requests(self):
         for url in self.urls:
             yield scrapy.Request(url=url,meta={'plant_form':'chengdu'})
     def deal_content(self, response):
         if response.status > 400:
-            return
+            return CloseSpider()
         ##############################################  7-21  ##################
         # content_dict,content_class=deal_response.deal_response(response)
         # DOC_class.insert(content_dict)
@@ -83,6 +79,13 @@ class newssc(scrapy.Spider):
         #     publish_time=response.xpath('/html/body/div[4]/div[2]/p/span[4]').extract()[0]+':00'
         # except:
         #     print 'time wrong'
+
+        # title=response.xpath('//div[@class="neirong"]/h2').extract()#body > div.content > div.neirong > h2
+        # print title
+
+
+
+
         data_TCPI=gather_all_funtion.get_result_you_need(response)
         title=data_TCPI[0]
         content=data_TCPI[1]

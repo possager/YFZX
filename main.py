@@ -1,5 +1,5 @@
 #_*_coding:utf-8_*_
-from YFZX.proxy_to_redis import get_Proxy
+# from YFZX.proxy_to_redis import get_Proxy
 from scrapy import cmdline
 import threading
 from multiprocessing import pool
@@ -10,7 +10,7 @@ from multiprocessing import pool
 import subprocess
 import os
 
-
+#############################################################台海网的数据抓取不完全,
 
 
 #需要添加的功能:1,定时启动设置,2,关于redis的清空设置,3线程速度控制
@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     # run_processSpider(spider_name_list)
 
-    cmdline.execute('scrapy crawl chengdu'.split())
+    cmdline.execute('scrapy crawl taihainet'.split())

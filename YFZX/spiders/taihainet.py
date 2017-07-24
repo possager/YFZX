@@ -12,12 +12,14 @@ class taihainet(scrapy.Spider):
     name = 'taihainet'
     #http://m.taihainet.com/news/
     #http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid=40
-    urls=['http://m.taihainet.com/news/']
+    urls=['http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid=3000000']
     def start_requests(self):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
         for url_to_visit in self.urls:
-            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={'contentid':1000000000})
+            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={'contentid':1000000000,
+                                                                                   'plant_form':'None',
+                                                                                   'download_timeout':3})
 
     def getID_from_mainpage(self,response):
         if response.request.cookies:
@@ -37,7 +39,9 @@ class taihainet(scrapy.Spider):
         Re_find_id_in_mainPage=re.compile(r'id\:.*?\,')
         web_id=Re_find_id_in_mainPage.findall(response.body)[0].replace('id:','').replace(',','')
         pass
-        yield scrapy.Request(url='http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid='+web_id,cookies=cookies,headers=headers,meta={'contentid':int(web_id)})
+        yield scrapy.Request(url='http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid='+web_id,cookies=cookies,headers=headers,meta={'contentid':int(web_id),
+                                                                                                                                                                            'download_time':5,
+                                                                                                                                                                            'plant_form':'None'})
 
     def deal_index(self,response):
         print response.meta['contentid']
@@ -57,9 +61,6 @@ class taihainet(scrapy.Spider):
                 else:
                     headers[headers_key]=response.headers[headers_key]
 
-        # thisurl = response.url
-        # thisurl_split = thisurl.split('contentid=')
-        # nexturl = thisurl_split[0] + 'contentid=' + str(int(thisurl_split[1] + 20))
 
         taihainet_contentid=response.meta['contentid']
         response_body=response.body.split('(')[1].split(')')[0]
@@ -71,8 +72,6 @@ class taihainet(scrapy.Spider):
         datajson_data=datajson['data']
         for one_index in datajson_data:
             id= one_index['contentid']
-            # if int(one_index['contentid'])<taihainet_contentid:
-            #     taihainet_contentid=int(one_index['contentid'])
             title= one_index['title']
             url= one_index['url']
             thisindex={
@@ -80,16 +79,15 @@ class taihainet(scrapy.Spider):
                 'title':title,
                 'url':url
             }
-            yield scrapy.Request(url=url,meta={'data':thisindex,'contentid':taihainet_contentid},cookies=cookies,headers=headers)
+            yield scrapy.Request(url=url,meta={'data':thisindex,'contentid':taihainet_contentid,'download_timeout':10,'plant_form':'taihainet'},cookies=cookies,headers=headers)
         thisurl=response.url
         thisurl_split=thisurl.split('contentid=')
         nexturl=thisurl_split[0]+'contentid='+str(taihainet_contentid-40)
-
-        # if taihainet_contentid > response.meta['contentid'] or taihainet_contentid<2000000:
         if taihainet_contentid > 100:
-            yield scrapy.Request(url=nexturl,meta={'contentid':taihainet_contentid},headers=headers,cookies=cookies)
+            yield scrapy.Request(url=nexturl,meta={'contentid':taihainet_contentid,
+                                                   'download_timeout':10,
+                                                   'plant_form':'taihainet'},headers=headers,cookies=cookies)
         else:
-            # print response.meta['contentid']
             print taihainet_contentid
             print '------------------------------------------------!'
 

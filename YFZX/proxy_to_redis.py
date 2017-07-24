@@ -1,3 +1,4 @@
+#_*_coding:utf-8_*_
 import requests
 import redis
 import json
@@ -20,10 +21,10 @@ def get_Proxy():
         for proxyip in data_json['data']['proxy_list']:
             print proxyip
             # redis1.rpush('999',proxyip)
-            redis1.lpush('999',proxyip)
+            redis1.lpush('999',proxyip)#左进右出
     get_proxy_to_redis()
     while True:
-        while redis1.llen('999') < 1000:
+        while redis1.llen('999') < 200:
             time.sleep(random.randint(3,5))
             get_proxy_to_redis()
 

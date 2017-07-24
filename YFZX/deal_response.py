@@ -79,7 +79,28 @@ def deal_response(response):
         fatherstructure_class.TAL = lenth  # 这个指标被我给改变了,是我自定义的一个指标
         fatherstructure_class.ND=len(fatherstructure_class.xpath.split('/'))
         #添加数据格式化处理模块
-
+        #--------------------------
+        xpathdoc_one = {
+            # 'PL':fatherstructure_class.PN,
+            'TL': fatherstructure_class.TL,
+            'name': fatherstructure_class.name,
+            'num': fatherstructure_class.num,
+            'xpath': fatherstructure_class.xpath,
+            'content': content.replace('"', '_+_'),
+            'PN': fatherstructure_class.PN,
+            'ND': fatherstructure_class.ND,
+            'TAL': fatherstructure_class.TAL,
+            'TP': fatherstructure_class.TP,
+            'has_url': fatherstructure_class.has_url,
+            'divnum': fatherstructure_class.divnum,
+            'classname': fatherstructure_class.classname,  # 7-21日添加
+            'statistics': fatherstructure_class.statistics,
+            'len_this_tag': fatherstructure_class.len_this_tag,
+            'xpath_x_value': thisclass.xpath_x_value,
+            'value_of_div_xpath': thisclass.value_of_div_xpath
+        }
+        thisclass_dict['data'].append(xpathdoc_one)
+        #-------------------------
 
 
 
@@ -142,26 +163,26 @@ def deal_response(response):
                         print e
 
 
-                    xpathdoc_one = {
-                        # 'PL':fatherstructure_class.PN,
-                        'TL': fatherstructure_class.TL,
-                        'name': fatherstructure_class.name,
-                        'num': fatherstructure_class.num,
-                        'xpath': fatherstructure_class.xpath,
-                        'content': content.replace('"', '_+_'),
-                        'PN': fatherstructure_class.PN,
-                        'ND': fatherstructure_class.ND,
-                        'TAL': fatherstructure_class.TAL,
-                        'TP': fatherstructure_class.TP,
-                        'has_url': fatherstructure_class.has_url,
-                        'divnum': fatherstructure_class.divnum,
-                        'classname': fatherstructure_class.classname,  # 7-21日添加
-                        'statistics': fatherstructure_class.statistics,
-                        'len_this_tag': fatherstructure_class.len_this_tag,
-                        'xpath_x_value':thisclass.xpath_x_value,
-                        'value_of_div_xpath':thisclass.value_of_div_xpath
-                    }
-                    thisclass_dict['data'].append(xpathdoc_one)
+                    # xpathdoc_one = {
+                    #     # 'PL':fatherstructure_class.PN,
+                    #     'TL': fatherstructure_class.TL,
+                    #     'name': fatherstructure_class.name,
+                    #     'num': fatherstructure_class.num,
+                    #     'xpath': fatherstructure_class.xpath,
+                    #     'content': content.replace('"', '_+_'),
+                    #     'PN': fatherstructure_class.PN,
+                    #     'ND': fatherstructure_class.ND,
+                    #     'TAL': fatherstructure_class.TAL,
+                    #     'TP': fatherstructure_class.TP,
+                    #     'has_url': fatherstructure_class.has_url,
+                    #     'divnum': fatherstructure_class.divnum,
+                    #     'classname': fatherstructure_class.classname,  # 7-21日添加
+                    #     'statistics': fatherstructure_class.statistics,
+                    #     'len_this_tag': fatherstructure_class.len_this_tag,
+                    #     'xpath_x_value':thisclass.xpath_x_value,
+                    #     'value_of_div_xpath':thisclass.value_of_div_xpath
+                    # }
+                    # thisclass_dict['data'].append(xpathdoc_one)
                     #7-23日添加，因为在下边字典中的话fatherclass的内容就改变了
 
                     ##################################################  7-21  #########################################
