@@ -16,7 +16,8 @@ def get_Proxy():
 
     def get_proxy_to_redis():
         session1=requests.session()
-        webdata=session1.request(method='GET',url='http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1')
+        proxy_url='http://dps.kuaidaili.com/api/getdps/?orderid=940097016277555&num=50&ut=1&format=json&sep=1 '
+        webdata=session1.request(method='GET',url=proxy_url)
         data_json=json.loads(webdata.text)
         for proxyip in data_json['data']['proxy_list']:
             print proxyip
@@ -24,8 +25,8 @@ def get_Proxy():
             redis1.lpush('999',proxyip)#左进右出
     get_proxy_to_redis()
     while True:
-        while redis1.llen('999') < 200:
-            time.sleep(random.randint(3,5))
+        while redis1.llen('999') < 300:
+            time.sleep(random.randint(1,3))
             get_proxy_to_redis()
 
 

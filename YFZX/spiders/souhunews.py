@@ -17,6 +17,12 @@ import coding
 import hashlib
 
 
+#isIndex_request
+#plant_form
+#download_timeout
+#后来添加的两个contentid没有对应的存储功能
+
+
 class souhunews(scrapy.Spider):
     name = 'sohu'
     headers = {
@@ -31,7 +37,7 @@ class souhunews(scrapy.Spider):
         urls=['http://v2.sohu.com/public-api/feed?scene=CHANNEL&sceneId=8&page=1&size=20',
               'https://api.m.sohu.com/autonews/cpool/?n=%E6%96%B0%E9%97%BB&s=0&c=20&dc=1']
         for url in urls:
-            yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None'})
+            yield scrapy.Request(url=url,headers=headers,meta={'plant_form':'None','isIndex_request':True})
 
     # def parse(self, response):
     #     print response.body
@@ -49,7 +55,8 @@ class souhunews(scrapy.Spider):
                                                                                                  'id':i['id'],
                                                                                                  'original_url':response.url,
                                                                                                  'plant_form':'sohu',
-                                                                                                 'download_timeout':3
+                                                                                                 'download_timeout':3,
+                                                                                                 'isIndex_request':True
                                                                                                  })
 
         headers = {
@@ -65,7 +72,8 @@ class souhunews(scrapy.Spider):
         if int(urldealnum)<950:
             urlnext=urldeal1+'s='+str(int(urldealnum)+1)+'&'+urldeal3+'&dc=1'
             yield scrapy.Request(url=urlnext,headers=headers,meta={'plant_form':'None',
-                                                                   'download_timeout':3})
+                                                                   'download_timeout':3,
+                                                                   'isIndex_request':False})
             print 'sucessfully yield----',urlnext
 
 
@@ -98,7 +106,8 @@ class souhunews(scrapy.Spider):
             'id':id,
             'publish_user':publish_user,
             'title':title,
-            'download_timeout':3})
+            'download_timeout':3,
+            'isIndex_request':True})
         url_this_index=response.url.split('page=')
         url_next_index=url_this_index[0]+'page='+str(int(url_this_index[1].split('&')[0])+1)+'&size=20'
         print url_next_index
@@ -118,7 +127,7 @@ class souhunews(scrapy.Spider):
         url= response.url
         publish_user= response.meta['publish_user']
         title= response.meta['title']
-        time_format = '’%Y-%m-%d'
+        time_format = '%Y-%m-%d'
         # spider_time = time.strftime(time_format, time.localtime())  # spider_time
         # publish_time = post['pubtime']  # publish_time
         # publish_time= time.strftime(time_format,response.meta['publish_time'])
@@ -138,7 +147,7 @@ class souhunews(scrapy.Spider):
             except Exception as e:
                 print e
                 print 'wrong in get content'
-        time_format='’%Y-%m-%d'
+        time_format='%Y-%m-%d'
         spider_time=time.strftime(time_format,time.localtime())
         # print spider_time
         article= response.xpath('/html/body/section[1]/article').extract()
@@ -189,6 +198,7 @@ class souhunews(scrapy.Spider):
                                                                                                                                                                'newsid':newsid,
                                                                                                                                                                'plant_form':'None',
                                                                                                                                                                'download_timeout':3,
+                                                                                                                                                               'isIndex_request':True
                                                                                                                                                                })
 
     def deal_content2(self,response):
@@ -228,7 +238,8 @@ class souhunews(scrapy.Spider):
             url_to_comments='https://apiv2.sohu.com/api/comment/list?page_size=10&topic_id='+str(comment_id_find_by_re)+'&page_no=2'
             yield scrapy.Request(url=url_to_comments,headers=response.headers,meta={'plant_form':'None',
                                                                                     'data':data,
-                                                                                    'download_timeout':3
+                                                                                    'download_timeout':3,
+                                                                                    'isIndex_request':True
                                                                                     })
         except Exception as e:
             print e
@@ -308,45 +319,8 @@ class souhunews(scrapy.Spider):
             except Exception as e:
                 print e,'wrong1'
 
-
-
-
-
-            # commentdata=unicode(response.body,encoding='GBK',errors='ignore')
-            # commentjson=json.loads(commentdata)
-            # # print commentjson
-            # if commentjson['data']['comments']:
-            #
-            #     for i in commentjson['data']['comments']:
-            #         for j in i:
-            #             if j==u'from':
-            #                 print i['from']
-            #                 pass
-            #             else:
-            #                 print i[j]
-            #         thisid=i['comment_id']
-            #
-            #
-            #         print thisid
-                    # yield thisclassx
-
-
-
-
         else:
             Save_result(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['newsid'],datatype='news',full_data={'data':response.meta['data']})
-
-            # thiscommentfile=BASIC_FILE+'/搜狐新闻/speeches/'+str(response.meta['publish_time'].split(' ')[0])
-            # if os.path.exists(thiscommentfile):
-            #     with open(thiscommentfile+'/'+'Sohu_'+str(int(time.mktime(time.strptime(response.meta['publish_time'],'%Y-%m-%d %H:%M:%S'))))+str(hashlib.md5(response.url).hexdigest())+'_'+str(response.meta['newsid']),'w+') as cmfl:
-            #         # cmfl.write(str(preCommentDict))
-            #         json.dump({'data':response.meta['data']},cmfl)
-            # else:
-            #     os.makedirs(thiscommentfile)
-            #     with open(thiscommentfile+str('/'+'Sohu_'+str(int(time.mktime(time.strptime(response.meta['publish_time'],'%Y-%m-%d %H:%M:%S'))))+'_'+str(hashlib.md5(response.url).hexdigest())+'_'+str(response.meta['newsid'])),'w+') as cmfl:
-            #         # cmfl.write(json.loads(preCommentDict))
-            #         json.dump({'data':response.meta['data']},cmfl)
-            # Save_zip(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['newsid'],datatype='news')
         print '----------------------------------------'
 
     # def close(spider, reason):
@@ -358,7 +332,8 @@ class souhunews(scrapy.Spider):
             data_json = json.loads(response.body)
             if data_json['jsonObject']['error_code']:
                 return scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5',meta={'plant_form':'None',
-                                                                                                                                                   'download_timeout':3})
+                                                                                                                                                   'download_timeout':3,
+                                                                                                                                                   'isIndex_request':False})
         except Exception as e:
             # yield scrapy.Request(url='http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=502873239&page_no=1&hot_size=5')
             pass
@@ -420,7 +395,8 @@ class souhunews(scrapy.Spider):
             print url_next_comment
             yield scrapy.Request(url=url_next_comment,meta={'data':data,
                                                             'plant_form':'None',
-                                                            'download_timeout':3})
+                                                            'download_timeout':3,
+                                                            'isIndex_request':False})
         except Exception as e:
             print e
             return

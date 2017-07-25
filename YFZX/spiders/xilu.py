@@ -6,6 +6,10 @@ import time
 from YFZX import gather_all_funtion
 from YFZX import persionalSetting
 #这个网站在对应板块的url被访问完的时候，会返回空的列表[]
+#这个网站是有评论的。。。。。。。。。。。。。
+#http://changyan.sohu.com/api/2/topic/comments?callback=jQuery17008864328161226998_1500974781673&client_id=cysYw3AKM&page_size=30&topic_id=3527226100&page_no=1&_=1500974781966
+#http://changyan.sohu.com/api/2/topic/comments?callback=jQuery170016130385152918425_1500974409334&client_id=cysYw3AKM&page_size=30&topic_id=3463438994&page_no=1&_=1500974409535
+
 
 class xilu(scrapy.Spider):
     name = 'xilu'
@@ -15,7 +19,7 @@ class xilu(scrapy.Spider):
           'http://m.xilu.com/list_1283.html',
           'http://m.xilu.com/list_1311.html',
           'http://m.xilu.com/list_1142.html',
-          'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
+          # 'http://m.xilu.com/list_1412.html'#这个是解析图片，估计会出现解析不准确的情况。
           'http://m.xilu.com/list_1469.html'
           ]
     def start_requests(self):
@@ -32,14 +36,16 @@ class xilu(scrapy.Spider):
 
         }
         for url_to_visit in self.urls:
-            for i in range(0,100):
+            for i in range(0,300):
                 time.sleep(1)
-                yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":str(i)}},headers=headers,meta={'plant_form':'None'})
+                yield scrapy.http.FormRequest(url=url_to_visit,method='post',formdata={'params':{"page":str(i)}},headers=headers,meta={'plant_form':'None',
+                                                                                                                                       'isIndex_request':True})
 
     def deal_index(self, response):
         print response.body
 
-        json_charge=json.loads('['+response.body.split('[')[1].split(']')[0]+']')
+        # json_charge=json.loads('['+response.body.split('[')[1].split(']')[0]+']')
+        json_charge=json.loads(json.dumps(eval(response.body)))
         if not json_charge:
             return
 
@@ -79,16 +85,17 @@ class xilu(scrapy.Spider):
             # }})
             # print 'http://m.xilu.com/v/'+str(id)+'.html'
 
-            # yield scrapy.http.FormRequest(url=url_page,method='post',headers=headers,meta={
-            #     'data':{
-            #         'title':title,
-            #         'read_count':read_count,
-            #         'publish_time':publish_time,
-            #         'id':id,
-            #         'url':url_page
-            #     },
-            #     'plant_form':'xilu'
-            # })
+            yield scrapy.http.FormRequest(url=url_page,method='post',headers=headers,meta={
+                'data':{
+                    'title':title,
+                    'read_count':read_count,
+                    'publish_time':publish_time,
+                    'id':id,
+                    'url':url_page
+                },
+                'plant_form':'xilu',
+                'isIndex_request':False
+            })
 
     def deal_content(self,response):
         persionalSetting.Save_org_file(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],

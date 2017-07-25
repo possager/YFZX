@@ -67,5 +67,5 @@ if __name__ == '__main__':
     # thisclass.examing('baidu.com','sohu')
 
 
-    # thisclass.creat_url_list_in_redis()
-    thisclass.examing('baidu.com','baidu')
+    thisclass.creat_url_list_in_redis()
+    # thisclass.examing('baidu.com','baidu')

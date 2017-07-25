@@ -6,13 +6,18 @@ import json
 from YFZX import gather_all_funtion
 from YFZX import persionalSetting
 
+#莫名其妙的就停了下来（代理是个坑）
+#raise NotImplementedError还有这种bug？什么鬼
+#还是不报错就停下来，莫名其妙，估计跟代理有关，404太多导致index的请求被拒绝，之后没有内容继续跟进(没错)
+
 
 
 class taihainet(scrapy.Spider):
     name = 'taihainet'
-    #http://m.taihainet.com/news/
+    #http://m.taihainet.com/news/#用这个网站的话表示用主页里边获得contentid来定位当前请求的其实contentid
     #http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid=40
     urls=['http://app.taihainet.com/?app=mobile&controller=list&jsoncallback=json&catid=100&contentid=3000000']
+
     def start_requests(self):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
@@ -63,7 +68,7 @@ class taihainet(scrapy.Spider):
 
 
         taihainet_contentid=response.meta['contentid']
-        response_body=response.body.split('(')[1].split(')')[0]
+        response_body='{'+response.body.split('({')[1].split('})')[0]+'}'
         try:
             datajson= json.loads(response_body)
         except Exception as e:
@@ -71,6 +76,8 @@ class taihainet(scrapy.Spider):
             return
         datajson_data=datajson['data']
         for one_index in datajson_data:
+            if taihainet_contentid>int(one_index['contentid']):
+                taihainet_contentid=int(one_index['contentid'])
             id= one_index['contentid']
             title= one_index['title']
             url= one_index['url']
@@ -79,14 +86,19 @@ class taihainet(scrapy.Spider):
                 'title':title,
                 'url':url
             }
-            yield scrapy.Request(url=url,meta={'data':thisindex,'contentid':taihainet_contentid,'download_timeout':10,'plant_form':'taihainet'},cookies=cookies,headers=headers)
+            yield scrapy.Request(url=url,meta={'data':thisindex,'contentid':taihainet_contentid,'download_timeout':10,'plant_form':'taihainet','isIndex_request':False},cookies=cookies,headers=headers)
+
+
         thisurl=response.url
         thisurl_split=thisurl.split('contentid=')
         nexturl=thisurl_split[0]+'contentid='+str(taihainet_contentid-40)
         if taihainet_contentid > 100:
             yield scrapy.Request(url=nexturl,meta={'contentid':taihainet_contentid,
                                                    'download_timeout':10,
-                                                   'plant_form':'taihainet'},headers=headers,cookies=cookies)
+                                                   'plant_form':'taihainet',
+                                                   'isIndex_request':True},headers=headers,cookies=cookies)
+
+
         else:
             print taihainet_contentid
             print '------------------------------------------------!'

@@ -11,6 +11,11 @@ from YFZX.persionalSetting import Save_zip
 from scrapy.exceptions import CloseSpider
 import random
 
+#isIndex_request
+#plant_form
+#download_timeout
+
+#这个没有大问题，貌似时间处理模块可以继续优化一下
 
 
 class mycd_qq(scrapy.Spider):
@@ -29,7 +34,8 @@ class mycd_qq(scrapy.Spider):
         time.sleep(random.randint(2,3))
         yield scrapy.Request(url=url,cookies={'pgv_info':'ssid=s2580718070', 'ts_last':'panda.qq.com/cd/index', 'pgv_pvid':'6693827820', 'ts_uid':'6358905536', 'pgv_pvi':'7088397312', 'pgv_si':'s8851519488'},
                              headers=headers,meta={'plant_form':'None',
-                                                   'download_timeout':3})#plant_form在examing_redis中可以找到对应的代码值
+                                                   'download_timeout':3,
+                                                   'isIndex_request':True})#plant_form在examing_redis中可以找到对应的代码值
 
     def deal_index(self, response):
         # print response.url
@@ -91,25 +97,27 @@ class mycd_qq(scrapy.Spider):
             response_headrs['Referer'] = 'http://panda.qq.com/cd/thread/' + str(data_data['tid'])
 
             yield scrapy.Request(url='http://panda.qq.com/cd/interface/topic/getThreadByTid?s_code=&tid='+str(tid),meta={'like_count':like_count,
-                                                                                     'publish_user_id':publish_user_id,
-                                                                                     'title':title,
-                                                                                    'plant_form': 'mycd_qq',
-                                                                                     'spider_time':time.time(),
-                                                                                     'reply_count':reply_count,
-                                                                                     'publish_time':publish_time,
-                                                                                     'read_count':read_count,
-                                                                                     'publish_user':publisher_name,
-                                                                                     'publish_user_photo':publish_user_photo,
-                                                                                     'id':tid,
-                                                                                    'url':response.url,
-                                                                                    'download_time':3
+                                                                                                                         'publish_user_id':publish_user_id,
+                                                                                                                         'title':title,
+                                                                                                                        'plant_form': 'mycd_qq',
+                                                                                                                         'spider_time':time.time(),
+                                                                                                                         'reply_count':reply_count,
+                                                                                                                         'publish_time':publish_time,
+                                                                                                                         'read_count':read_count,
+                                                                                                                         'publish_user':publisher_name,
+                                                                                                                         'publish_user_photo':publish_user_photo,
+                                                                                                                         'id':tid,
+                                                                                                                        'url':response.url,
+                                                                                                                        'download_time':3,
+                                                                                                                         'isIndex_request':False,
+
                                                                                     },headers=response_headrs)
 
         #7-16日添加,增加对应所有链接的url
         urlindex_this=response.url
         urlindex_next_split= urlindex_this.split('page=')
         urlindex_next=urlindex_next_split[0]+'page='+str(int(urlindex_next_split[1].split('&')[0])+1)+'&pagesize=10'
-        yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies,meta={'plant_form':'None','download_timeout':3})
+        yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies,meta={'plant_form':'None','download_timeout':3,'isIndex_request':True})
 
     def deal_content(self,response):
         Save_org_file(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.url,#这里边的网页的回复本身就是json
@@ -156,6 +164,7 @@ class mycd_qq(scrapy.Spider):
         data['reproduce_count']=reproduce_count
         data['plant_form']='mycd_qq'
         data['download_timeout']=3
+        data['isIndex_request']=False
 
 
 
@@ -209,6 +218,7 @@ class mycd_qq(scrapy.Spider):
                 }
                 response.meta['reply_nodes'].append(comment_only_one)
                 response.meta['download_timeout']=3
+                response.meta['isIndex_request']=True
 
             this_comment_url=response.url.split('&page=')
             next_comment_url=this_comment_url[0]+'&page='+str(int(this_comment_url[1].split('&')[0])+1)+'&sort=time&size=20'

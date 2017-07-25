@@ -9,9 +9,10 @@ import os.path
 import os
 
 
+#/media/liang/Data/project/YFzhongxin/dataGetBySpider/one #/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one
+#F:\project\YFzhongxin\dataGetBySpider\one
 
-
-BASIC_FILE='/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one'#/media/liang/Data/project/YFzhongxin/dataGetBySpider/one #/media/liang/3804CCCA04CC8C76/project/YFzhongxin/dataGetBySpider/one
+BASIC_FILE='F:/project/YFzhongxin/dataGetBySpider/one'
 #这里边几个函数的最后一个变量向来是没什么用的
 
 class ZFile(object):

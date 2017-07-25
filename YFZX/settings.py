@@ -49,6 +49,9 @@ ROBOTSTXT_OBEY = False
 SPIDER_MIDDLEWARES = {
     # 'YFZX.middlewares.YfzxSpiderMiddleware': 543,
     'YFZX.middlewares.refuseMiddleware': 300,
+    # 'YFZX.middlewares.DownloadTimeoutMiddleware':301,
+    'YFZX.middlewares.RetryMiddleware':302
+
 
 }
 
@@ -57,7 +60,9 @@ SPIDER_MIDDLEWARES = {
 DOWNLOADER_MIDDLEWARES = {
     # 'YFZX.middlewares.MyCustomDownloaderMiddleware': 543,
     'YFZX.middlewares.responseToWhereMiddleware': 300,
-    'YFZX.middlewares.HttpProxyMiddleware':301
+    'YFZX.middlewares.HttpProxyMiddleware':301,
+    'YFZX.middlewares.RetryMiddleware':302
+
 
 }
 
@@ -94,3 +99,7 @@ ITEM_PIPELINES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 CONCURRENT_REQUESTS=20
+# RETRY_TIMES=5
+
+CONCURRENT_REQUESTS=32
+CONCURRENT_REQUESTS_PER_DOMAIN=8
