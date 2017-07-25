@@ -105,7 +105,13 @@ class xilu(scrapy.Spider):
         content=data_TCPI[1]
         data=response.meta
         data['content']=content
-        persionalSetting.Save_result(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
-                                       newsidOrtid=response.meta['data']['id'],datatype='news',full_data=data)
         persionalSetting.Save_zip(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
                                        newsidOrtid=response.meta['data']['id'],datatype='news')
+
+        yield scrapy.Request()
+
+#http://changyan.sohu.com/api/2/topic/comments?page_size=30&topic_id=3527226100&page_no=2
+    def deal_comment(self,response):
+        persionalSetting.Save_result(plantform='xilu', date_time=response.meta['data']['publish_time'],
+                                     urlOruid=response.meta['data']['url'],
+                                     newsidOrtid=response.meta['data']['id'], datatype='news', full_data=data)

@@ -15,7 +15,7 @@ from scrapy.exceptions import CloseSpider
 import time
 
 
-#####################chengdu这个是是时间处理模块有问题,问题出在在正文模块中找到对应的时间格式的那部分,总是找不准,导致根据时间来存储数据的模块出了问题7-25
+######################chengdu这个是是时间处理模块有问题,问题出在在正文模块中找到对应的时间格式的那部分,总是找不准,导致根据时间来存储数据的模块出了问题7-25
 ######################这里的redis运作正常,代理运作正常,可以根据需要添加download_timeout参数.
 ######################在gettitle的模块中有一个问题,是数组取值的时候出现的.
 
@@ -31,7 +31,7 @@ class newssc(scrapy.Spider):
         for url in self.urls:
             yield scrapy.Request(url=url,meta={'plant_form':'chengdu'})
     def deal_content(self, response):
-        if response.status > 400:
+        if response.status == 404:
             return CloseSpider()
         ##############################################  7-21  ##################
         # content_dict,content_class=deal_response.deal_response(response)
