@@ -98,20 +98,42 @@ class xilu(scrapy.Spider):
             })
 
     def deal_content(self,response):
-        persionalSetting.Save_org_file(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
-                                       newsidOrtid=response.meta['data']['id'],datatype='news',full_data=response.body)
+
         data_TCPI=gather_all_funtion.get_result_you_need(response)
         print data_TCPI
         content=data_TCPI[1]
         data=response.meta
         data['content']=content
-        persionalSetting.Save_zip(plantform='xilu',date_time=response.meta['data']['publish_time'],urlOruid=response.meta['data']['url'],
+        #发现发布时间里边有'刚刚，1小时前，2小时前，3小时前'
+        publish_time=response.meta['data']['publish_time']
+        if publish_time==u'刚刚':
+            publish_time=time.time()
+        elif u'小时前' in publish_time:
+            time_pass=int(publish_time.replace(u'小时前',''))*60*60
+            publish_time=time.time()-time_pass
+        elif u'分钟前' in publish_time:
+            time_pass=int(publish_time.replace(u'分钟前',''))*60
+            publish_time=time.time()-time_pass
+        elif '-' in publish_time and len(publish_time)==5:
+            publish_time='2017-'+publish_time
+
+        persionalSetting.Save_org_file(plantform='xilu', date_time=publish_time,
+                                       urlOruid=response.meta['data']['url'],
+                                       newsidOrtid=response.meta['data']['id'], datatype='news',
+                                       full_data=response.body)
+        persionalSetting.Save_zip(plantform='xilu',date_time=publish_time,urlOruid=response.meta['data']['url'],
                                        newsidOrtid=response.meta['data']['id'],datatype='news')
 
-        yield scrapy.Request()
+
+        #http://changyan.sohu.com/api/3/topic/liteload?&client_id=cysYw3AKM&page_size=30&hot_size=10&topic_source_id=1000010001000523
+        cmt_url_without_id='http://changyan.sohu.com/api/3/topic/liteload?&client_id=cysYw3AKM&page_size=30&hot_size=10&topic_source_id='
+        this_page_id=response.url.split('/')[-1].split('.')[0]
+        cmt_url=cmt_url_without_id+this_page_id
+        yield scrapy.Request(url=cmt_url,headers=response.headers)
 
 #http://changyan.sohu.com/api/2/topic/comments?page_size=30&topic_id=3527226100&page_no=2
     def deal_comment(self,response):
-        persionalSetting.Save_result(plantform='xilu', date_time=response.meta['data']['publish_time'],
-                                     urlOruid=response.meta['data']['url'],
-                                     newsidOrtid=response.meta['data']['id'], datatype='news', full_data=data)
+        print response.body
+        # persionalSetting.Save_result(plantform='xilu', date_time=response.meta['data']['publish_time'],
+        #                              urlOruid=response.meta['data']['url'],
+        #                              newsidOrtid=response.meta['data']['id'], datatype='news', full_data=response.meta['data'])

@@ -48,7 +48,7 @@ ROBOTSTXT_OBEY = False
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 SPIDER_MIDDLEWARES = {
     # 'YFZX.middlewares.YfzxSpiderMiddleware': 543,
-    'YFZX.middlewares.refuseMiddleware': 300,
+    # 'YFZX.middlewares.refuseMiddleware': 300,
     # 'YFZX.middlewares.DownloadTimeoutMiddleware':301,
     'YFZX.middlewares.RetryMiddleware':302
 

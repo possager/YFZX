@@ -64,12 +64,13 @@ def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,foru
     date_time=str(date_time)
 
     print date_time
-    if '-' in date_time and ' ' in date_time:#u'1498141405'这里的两个if是时间戳
-        timeArray=time.strptime(date_time,'%Y-%m-%d %H:%M:%S')
+    if '-' in date_time or ' ' in date_time:#u'1498141405'这里的两个if是时间戳 #改成or
+        # timeArray=time.strptime(date_time,'%Y-%m-%d %H:%M:%S')
+        timeArray = examing_datetime_format(date_time)
         date_time_strip=str(int(time.mktime(timeArray)))
         # print date_time_strip
-    elif len(date_time)==10 or (len(date_time) >=13 and len(date_time)<19):
-        date_time_strip=str(date_time)
+    elif len(date_time)==10 or (len(date_time) >=13 and len(date_time)<17):
+        date_time_strip=str(date_time.split('.')[0])
     else:
         print 'Wrong'
         date_time="date_time_Wrong"
@@ -105,18 +106,21 @@ def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,foru
 def Save_org_file(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,forum_pubtimestrimp=None):
     basic_file = BASIC_FILE
     date_time=str(date_time)
-    if '-' in date_time and ' ' in date_time:  # u'1498141405'
-        try:
-            timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
-        except Exception:
-            try:
-                timeArray = time.strftime(date_time+':00','%Y-%m-%d %H:%M:%S')
-            except Exception:
-                print 'wrong in trys try'
+    if '-' in date_time or ' ' in date_time:  # u'1498141405'#7-26改成or
+        # try:
+        #     timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')#2017-07-26 12:40:12
+        # except Exception:
+        #     try:
+        #         timeArray = time.strptime(date_time+':00','%Y-%m-%d %H:%M:%S')#2017-7-26 12:40
+        #     except Exception:
+        #         print 'wrong in trys try'
+        timeArray=examing_datetime_format(date_time)
         date_time_strip = str(int(time.mktime(timeArray)))
+        if '.' in date_time_strip:
+            date_time_strip=date_time_strip.split('.')[0]
         # print date_time_strip
-    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19):
-        date_time_strip = str(date_time)
+    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 17) or '.' in date_time:
+        date_time_strip = str(date_time.split('.')[0])
     else:
         print 'Wrong'
         date_time = "date_time_Wrong"
@@ -155,12 +159,19 @@ def Save_zip(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimestri
     date_time=str(date_time)
 
     basic_file = BASIC_FILE
-    if '-' in date_time and ' ' in date_time:  # u'1498141405'
-        timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+    if '-' in date_time or ' ' in date_time:  # u'1498141405'#7-26日改成的and
+        # timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+        # date_time_strip = str(int(time.mktime(timeArray)))
+        # print date_time_strip
+
+        timeArray = examing_datetime_format(date_time)
         date_time_strip = str(int(time.mktime(timeArray)))
-        print date_time_strip
-    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19):
-        date_time_strip = str(date_time)
+        if '.' in date_time_strip:
+            date_time_strip = date_time_strip.split('.')[0]
+
+
+    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 17) or '.' in date_time:
+        date_time_strip = str(date_time.split('.')[0])
     else:
         print 'Wrong'
         date_time = "date_time_Wrong"
@@ -217,10 +228,15 @@ def Exam_exist(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimest
     date_time=str(date_time)
 
     if '-' in date_time and ' ' in date_time:  # u'1498141405'
-        timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+        # timeArray = time.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+        # date_time_strip = str(int(time.mktime(timeArray)))
+        # print date_time_strip
+        timeArray = examing_datetime_format(date_time)
         date_time_strip = str(int(time.mktime(timeArray)))
-        print date_time_strip
-    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19):
+        if '.' in date_time_strip:
+            date_time_strip = date_time_strip.split('.')[0]
+
+    elif len(date_time) == 10 or (len(date_time) >= 13 and len(date_time) < 19) or '.' in date_time:
         date_time_strip = str(date_time)
     else:
         print 'Wrong'
@@ -253,6 +269,23 @@ def Exam_exist(plantform,date_time,urlOruid,newsidOrtid,datatype,forum_pubtimest
 
         else:
             return 1
+
+
+def examing_datetime_format(timestr):
+    try:
+        timestrlist=time.strptime(timestr, "%Y-%m-%d")
+        return timestrlist
+    except:
+        try:
+            timestrlist=time.strptime(timestr,'%Y-%m-%d %H:%M')
+            return timestrlist
+        except:
+            try:
+                timestrlist=time.strptime(timestr,'%Y-%m-%d %H:%M:%S')
+                return timestrlist
+            except:
+                return '1111-11-11 11:11:11'
+
 
 
 if __name__ == '__main__':

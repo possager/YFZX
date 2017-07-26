@@ -171,6 +171,9 @@ class responseToWhereMiddleware(object):
                 print request.url
             elif 'http://apiv2.sohu.com/api/topic/load?page_size=10&topic_source_id=' in request.url:#7-20日发现这个url在每次请求评论的时候会出现在第一次的请求中.
                 request.callback=spider.deal_comment3
+
+            elif 'http://changyan.sohu.com/api/3/topic/liteload?&client_id=cysYw3AKM&page_size=30&hot_size=10&topic_source_id=' in request.url:#高能预警，这里绝对不是sohu的爬虫，是xilu的，但是无奈的是它就会传入这个网站。
+                request.callback=spider.deal_comment
         elif 'panda.qq.com' in request.url:
             if '//panda.qq.com/cd/interface/topic/' in request.url and 'pagesize' in request.url:
                 request.callback=spider.deal_index
@@ -234,10 +237,19 @@ class HttpProxyMiddleware(object):
 
         pass
 
-class refuseMiddleware(object):
-    def process_spider_input(self,response,spider):
-        if response.status in [400,403,404]:#这里还缺少一个url被404的次数
-            return response.request
+# class refuseMiddleware(object):
+#     def process_spider_input(self,response,spider):
+#         if response.status in [400,403,404]:#这里还缺少一个url被404的次数
+#             request_retry1= response.request
+#             proxy_ip = 'http://' + get_proxy_from_redis()
+#             request_retry1.meta['proxy']=proxy_ip
+#             return request_retry1
+#         if response.request.meta['isIndex_request']:
+#             request_retry1 = response.request
+#             proxy_ip = 'http://' + get_proxy_from_redis()
+#             request_retry1.meta['proxy'] = proxy_ip
+#             # return request_retry1
+
 
 class DownloadTimeoutMiddleware(object):
     def __init__(self, timeout=7):
@@ -290,6 +302,13 @@ class RetryMiddleware(object):
             request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
             #7-25
             return self._retry(request, reason, spider) or response
+        if response.status in [403,407]:#7-26日添加，发现有些网站返回407错误
+            reason = response_status_message(response.status)
+            request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
+            return self._retry(request,reason,spider) or response
+
+
+
         return response
 
     def process_exception(self, request, exception, spider):#当timeout出现次数过多的时候，会进入这个模块，比如连续5次错误，出现timeouterror的时候，debug里报这种错误 Gave up retrying
@@ -358,4 +377,5 @@ class RetryMiddleware(object):
                 stats.inc_value('retry/reason_count/%s' % reason)
                 return retryreq
             else:
-                return IgnoreRequest()
+                # return IgnoreRequest()
+                print 'this request is not index_request,so be ingored'

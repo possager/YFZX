@@ -1,22 +1,53 @@
 #_*_coding:utf-8_*_
-
+import time
 import requests
 
+
+
 session1=requests.session()
-headers = {
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
-            'X-Requested-With':'XMLHttpRequest',#重要
-            'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Encoding':'gzip, deflate, sdch',
-            'Accept-Language':'zh-CN,zh;q=0.8',
-            'Cache-Control':'max-age=0',
-            'Connection':'keep-alive',
-            'Host':'m.xilu.com',
-            'Upgrade-Insecure-Requests':'1'
-
-        }
-
-response1=session1.request(method='post',url='http://m.xilu.com/index.html',data={'page':300},headers=headers)
-print response1.text
 
 
+response_data=session1.request(method='post',url='')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# timedata=time.strptime('2017-07-26 12:40'+':00','%Y-%m-%d %H:%M:%S')
+# timestamp=time.mktime(timedata)
+# print timestamp
+# print timedata
+
+
+# def is_valid_date(str):
+#   '''判断是否是一个有效的日期字符串'''
+#   try:
+#       timestr=time.strptime(str, "%Y-%m-%d")
+#       return timestr
+#   except:
+#       return False
+#
+# if __name__ == '__main__':
+#     # print 'hellop'
+#     # if is_valid_date(str='2017-06-12'):
+#     #     print 'hello'
+#     # else:
+#     #     print 'hello2'
+#     print is_valid_date('2017-06-17')

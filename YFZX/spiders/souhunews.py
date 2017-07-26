@@ -341,6 +341,10 @@ class souhunews(scrapy.Spider):
                 data_json=json.loads(response.body.split('(')[1].split(')')[0])
             except Exception as e:
                 # print response.body
+                Save_result(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.meta['url'],
+                            newsidOrtid=response.meta['newsid'], datatype='news',
+                            full_data={'data': response.meta['data']})
+
                 return
 
         reply_nodes=[]
@@ -368,7 +372,7 @@ class souhunews(scrapy.Spider):
 
 
     def deal_comment3(self,response):#这里的评论处理是最后一个的时候,在其他的处理模块里都处理不了的时候才处理的,
-        #要注意的是,现在一共返现了3个comment评论的来源链接
+        #要注意的是,现在一共发现了3个comment评论的来源链接
         try:
             thiscommentList=[]
             data_json=json.loads(response.body)
@@ -399,4 +403,4 @@ class souhunews(scrapy.Spider):
                                                             'isIndex_request':False})
         except Exception as e:
             print e
-            return
+            Save_result(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['newsid'],datatype='news',full_data={'data':response.meta['data']})

@@ -58,6 +58,7 @@ def deal_response(response):
             content += tl
 
         content=content.replace('\r','').replace('\n','').replace('\t','')
+        fatherstructure_class.content=content#7-26日添加
         # fatherstructure_class.TL=len(fatherstructure_class.content.pop())#文本长度
 
         Re_find_symbol = re.compile(ur'[\,\.\'\"\;\。\-\，”“!《》！，\<\>\{\}\<\>]')
@@ -80,26 +81,26 @@ def deal_response(response):
         fatherstructure_class.ND=len(fatherstructure_class.xpath.split('/'))
         #添加数据格式化处理模块
         #--------------------------
-        xpathdoc_one = {
-            # 'PL':fatherstructure_class.PN,
-            'TL': fatherstructure_class.TL,
-            'name': fatherstructure_class.name,
-            'num': fatherstructure_class.num,
-            'xpath': fatherstructure_class.xpath,
-            'content': content.replace('"', '_+_'),
-            'PN': fatherstructure_class.PN,
-            'ND': fatherstructure_class.ND,
-            'TAL': fatherstructure_class.TAL,
-            'TP': fatherstructure_class.TP,
-            'has_url': fatherstructure_class.has_url,
-            'divnum': fatherstructure_class.divnum,
-            'classname': fatherstructure_class.classname,  # 7-21日添加
-            'statistics': fatherstructure_class.statistics,
-            'len_this_tag': fatherstructure_class.len_this_tag,
-            'xpath_x_value': thisclass.xpath_x_value,
-            'value_of_div_xpath': thisclass.value_of_div_xpath
-        }
-        thisclass_dict['data'].append(xpathdoc_one)
+        # xpathdoc_one = {
+        #     # 'PL':fatherstructure_class.PN,
+        #     'TL': fatherstructure_class.TL,
+        #     'name': fatherstructure_class.name,
+        #     'num': fatherstructure_class.num,
+        #     'xpath': fatherstructure_class.xpath,
+        #     'content': content.replace('"', '_+_'),
+        #     'PN': fatherstructure_class.PN,
+        #     'ND': fatherstructure_class.ND,
+        #     'TAL': fatherstructure_class.TAL,
+        #     'TP': fatherstructure_class.TP,
+        #     'has_url': fatherstructure_class.has_url,
+        #     'divnum': fatherstructure_class.divnum,
+        #     'classname': fatherstructure_class.classname,  # 7-21日添加
+        #     'statistics': fatherstructure_class.statistics,
+        #     'len_this_tag': fatherstructure_class.len_this_tag,
+        #     'xpath_x_value': thisclass.xpath_x_value,
+        #     'value_of_div_xpath': thisclass.value_of_div_xpath
+        # }
+        # thisclass_dict['data'].append(xpathdoc_one)
         #-------------------------
 
 
@@ -163,27 +164,27 @@ def deal_response(response):
                         print e
 
 
-                    # xpathdoc_one = {
-                    #     # 'PL':fatherstructure_class.PN,
-                    #     'TL': fatherstructure_class.TL,
-                    #     'name': fatherstructure_class.name,
-                    #     'num': fatherstructure_class.num,
-                    #     'xpath': fatherstructure_class.xpath,
-                    #     'content': content.replace('"', '_+_'),
-                    #     'PN': fatherstructure_class.PN,
-                    #     'ND': fatherstructure_class.ND,
-                    #     'TAL': fatherstructure_class.TAL,
-                    #     'TP': fatherstructure_class.TP,
-                    #     'has_url': fatherstructure_class.has_url,
-                    #     'divnum': fatherstructure_class.divnum,
-                    #     'classname': fatherstructure_class.classname,  # 7-21日添加
-                    #     'statistics': fatherstructure_class.statistics,
-                    #     'len_this_tag': fatherstructure_class.len_this_tag,
-                    #     'xpath_x_value':thisclass.xpath_x_value,
-                    #     'value_of_div_xpath':thisclass.value_of_div_xpath
-                    # }
-                    # thisclass_dict['data'].append(xpathdoc_one)
-                    #7-23日添加，因为在下边字典中的话fatherclass的内容就改变了
+                    xpathdoc_one = {
+                        # 'PL':fatherstructure_class.PN,
+                        'TL': thisclass2.TL,
+                        'name': thisclass2.name,
+                        'num': thisclass2.num,
+                        'xpath': thisclass2.xpath,
+                        'content': thisclass2.content.replace('"', '_+_'),
+                        'PN': thisclass2.PN,
+                        'ND': thisclass2.ND,
+                        'TAL': thisclass2.TAL,
+                        'TP': thisclass2.TP,
+                        'has_url': thisclass2.has_url,
+                        'divnum': thisclass2.divnum,
+                        'classname': thisclass2.classname,  # 7-21日添加
+                        'statistics': thisclass2.statistics,
+                        'len_this_tag': thisclass2.len_this_tag,
+                        'xpath_x_value':thisclass2.xpath_x_value,
+                        'value_of_div_xpath':thisclass2.value_of_div_xpath
+                    }
+                    thisclass_dict['data'].append(xpathdoc_one)
+                    # 7-23日添加，因为在下边字典中的话fatherclass的内容就改变了
 
                     ##################################################  7-21  #########################################
             except Exception as e:
@@ -193,7 +194,7 @@ def deal_response(response):
 
         ##################################  7-21  #######################################
         # try:
-        #     xpathdoc_one = {
+        #     xpathdoc_one = {#7-26日发现，如果用father的话，下一层只能保存上一层的信息，而加入自身是随后一层的信息，就不会保存，因为没有for，所以不存在保存。
         #         # 'PL':fatherstructure_class.PN,
         #         'TL': fatherstructure_class.TL,
         #         'name': fatherstructure_class.name,
@@ -212,7 +213,7 @@ def deal_response(response):
         #     }
         #     thisclass_dict['data'].append(xpathdoc_one)
         # except Exception as e:
-        #     pass
+        #     print 'append dict to thisclass_dict ocur wrong'
 
         ##################################  7-21  #######################################
     i1 = response.xpath('/child::node()')

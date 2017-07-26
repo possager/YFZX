@@ -16,12 +16,10 @@ class thepaper(scrapy.Spider):
     def start_requests(self):
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-            'Referer':'http://m.xilu.com/index.html',
-            'Origin':'http://m.xilu.com',
-            'Host':'m.xilu.com',
         }
         for url_to_visit in self.urls:
-            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={'plant_form':'thepaper'})
+            yield scrapy.Request(url=url_to_visit,headers=headers,cookies={},meta={'plant_form':'thepaper',
+                                                                                   'isIndex_request':True})
 
     def deal_index(self,response):
         if response.request.cookies:
@@ -45,7 +43,6 @@ class thepaper(scrapy.Spider):
         re_data=Re_pattern.findall(response.body)
         url_in_content =re_data[0].split('"')[1]
         nexturl='http://m.thepaper.cn/load_channel.jsp?'+url_in_content+str(1)
-        # print response.body
 
         print nexturl
         yield scrapy.Request(url=nexturl,headers=headers,cookies=cookies,meta={'data':{}})
@@ -65,6 +62,4 @@ class thepaper(scrapy.Spider):
                     cookies[cookies_name[0]]=cookies_name[1]
                 else:
                     headers[headers_key]=response.headers[headers_key]
-
-
         print response.xpath('div/a')##http://m.thepaper.cn/newDetail_commt.jsp?_=1499325674584&contid=1726057对应的评论的格式,评论也是放在对应的div标签中的,

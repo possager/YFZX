@@ -21,7 +21,10 @@ def get_content_block(xpath_content,xpath_title):
     for tag in xpath_content_list:
         xpath_content_str=xpath_content_str+'/'+tag
 
-    return xpath_content_str
+    if xpath_content_str:
+        return xpath_content_str
+    else:
+        return '/html/body'
 
 
 if __name__ == '__main__':

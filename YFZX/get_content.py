@@ -24,7 +24,8 @@ def getxpath(response_list):
     # result_list_ND=sorted(data,key=itemgetter('PN'),reverse=True)#这里改了，在pn里边按照ND的值来排序，因为nd这个指标的误差太大,后来发现还是不行，于是删除了
     # result_list_ND=sorted(result_list_ND,key=itemgetter('ND'),reverse=True)
     # result_list_xpath_x_value=sorted(data,key=itemgetter('xpath_x_value'),reverse=True)
-    result_list_value_of_xpath=sorted(response_list['data'],key=itemgetter('value_of_div_xpath'),reverse=True)
+    # result_list_value_of_xpath=sorted(response_list['data'],key=itemgetter('value_of_div_xpath'),reverse=True)#在改了字典的push顺序之后，这里总是出问题。这里边很多问题都是在字典的push
+    #顺序改了之后出毛病的
 
 
     result_dict={}

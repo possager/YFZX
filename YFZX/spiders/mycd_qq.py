@@ -252,5 +252,5 @@ class mycd_qq(scrapy.Spider):
 
 
 
-    def close(spider, reason):
-        raise CloseSpider('nothing')
+    # def close(spider, reason):
+    #     raise CloseSpider('nothing')
