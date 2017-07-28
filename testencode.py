@@ -1,53 +1,37 @@
 #_*_coding:utf-8_*_
-import time
-import requests
 
+import requests
+import time
+import re
 
 
 session1=requests.session()
+response_data=session1.request(method='GET',url='http://wap.chengdu.cn/1700001')
+response_data.encoding='utf-8'
+
+# Re_find_time_taoge2 = re.compile(
+#         ur'\d{4}?([年|\/|\/|\.|\s|\-]*?)\d{1,2}([月|\/|\/|\.|\s|\-]*?)\d{1,2}([日|\/|\/|\.|\s|\-]*?)\s*?\d{1,2}([\:|时|\-]*?)\d{1,2}([\:|分|\-]*?)\d{1,2}([\:|秒|\-]?)')
 
 
-response_data=session1.request(method='post',url='')
+Re_find_time_taoge2 = re.compile(
+        ur'\d{4}?[年|\/|\/|\.|\s|\-]*?\d{1,2}[月|\/|\/|\.|\s|\-]*?\d{1,2}[日|\/|\/|\.|\s|\-]*?\s*?\d{1,2}[\:|时|\-]*?\d{1,2}[\:|分|\-]*?\d{1,2}[\:|秒|\-]?')
 
+# Re_find_time_ll=re.compile(r'(\d{4}[年]?\d{2][月]?\d{2}[日]?\s.*?\d{1,2}[时|\:|\-]?\d{1,2}[分|\:|\-]?\d{1,2}[秒]?)|(\d{4}[\-]\d{2][\-]\d{2}[\-]\s.*?\d{1,2}[时|\:|\-]?\d{1,2}[分|\:|\-]?\d{1,2}[秒]?)')
 
-
-
-
-
-
-
-
-
-
-
-
+Re_find_time_ll=re.compile(r'\d{4}([年|\/|\/|\.|\s|\-]*?)\d{1,2}\1\d{1,2}\s\d{1,2}([\:|\-]*?)\d{1,2}\2\d{1,2}')
 
 
 
 
 
+test='123456asdqwertasdasdasdaaaaaaaaaaaa123456asd123456asdasdasd123456'
+Re_find_time=re.compile(r'\d{4}([\:|\/|\-])\d{2}\1')
+test2='2017-12-11 11:11:11             2017-11-11 11:11:11   2017-11/11 11H11M11s  2017/11/11 11:11:11'
+print Re_find_time.findall(test2)
 
 
-
+# print Re_find_time_ll.findall(response_data.text)
 #
-# timedata=time.strptime('2017-07-26 12:40'+':00','%Y-%m-%d %H:%M:%S')
-# timestamp=time.mktime(timedata)
-# print timestamp
-# print timedata
+# print Re_find_time_taoge2.findall(response_data.text)
 
 
-# def is_valid_date(str):
-#   '''判断是否是一个有效的日期字符串'''
-#   try:
-#       timestr=time.strptime(str, "%Y-%m-%d")
-#       return timestr
-#   except:
-#       return False
-#
-# if __name__ == '__main__':
-#     # print 'hellop'
-#     # if is_valid_date(str='2017-06-12'):
-#     #     print 'hello'
-#     # else:
-#     #     print 'hello2'
-#     print is_valid_date('2017-06-17')

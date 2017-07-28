@@ -39,7 +39,7 @@ def dealcontent(webpage_class):#如果title返回的结果如果是空的，会�
             dealcontent(webpage_class.child[one_key])
 
 
-def find_compare_list(title_str,webpage_class,maybe_content_list):
+def find_compare_list(title_str,webpage_class,maybe_content_list=[]):
     if title_str:
         this_content_len=len(title_str)
     else:
@@ -47,10 +47,10 @@ def find_compare_list(title_str,webpage_class,maybe_content_list):
 
 
     if webpage_class.content:#这里是否设计错误？content应该只有一个字符串的，怎么会有for，答：因为里边的content并没有被处理，所以自然是list的形式，后来成为一个str是因为后边的处理。
-        for one_content in webpage_class.content:
-            if len(one_content)<=this_content_len+5 and len(one_content)>3:#7-14调整过
-                if webpage_class.has_url == 0:
-                    maybe_content_list.append({one_content:webpage_class.xpath})
+        # for one_content in webpage_class.content:#7-27日，之前的content是list，但是现在是str了，所以for里边全是单个的字符串
+        if len(webpage_class.content)<=this_content_len+5 and len(webpage_class.content)>3:#7-14调整过7-26日调整，因为前边将content全部转换为str而不是list了,所以这里修改掉for，直接来if判断。
+            if webpage_class.has_url == 0:
+                maybe_content_list.append({webpage_class.content:webpage_class.xpath})
 
     for one_key in webpage_class.child.keys():
         find_compare_list(title_str,webpage_class.child[one_key],maybe_content_list)
@@ -73,8 +73,8 @@ def find_compare_title(title,webpage_class,maybe_content_list=[]):#这个这个m
     num = 500  # 500是随便取的,目的是为了获得长度最小的xpath,一般xpaht的长度都不会大于500
     target_xpath = ''
     while xpath_list:
-        xpath_in_while = xpath_list.pop()#这里边冒出来了很多xpath，即使这样可能还是有正文中的xpath，所以这里的目的是选取最短的xpath
-        if num > len(xpath_in_while.values()[0]):
+        xpath_in_while = xpath_list.pop()#这里边冒出来了很多xpath，即使这样可能还是有正文中的xpath，所以这里的目的是选取最短的xpath7-28日发现这里最短的xpath总是head中的title路径，设置了一个过滤选项。
+        if num > len(xpath_in_while.values()[0]) and 'head' not in xpath_in_while.values()[0]:
             num = len(xpath_in_while.values()[0])
             target_xpath = xpath_in_while
     return target_xpath#这个包括title和xpath两个部分，不只是xpath

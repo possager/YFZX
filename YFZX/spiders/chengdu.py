@@ -19,15 +19,15 @@ import time
 #isIndex_request
 #plant_form
 #download_timeout
+#http://wap.chengdu.cn/1700001这个网页有评论，可以找到评论的链接。
+#http://changyan.sohu.com/api/2/topic/comments?client_id=cyrHnxhFx&page_size=30&topic_id=630645353&page_no=1
 
-
-
-#抓不全，时间寻找出错，有些网页会没有内容，会导致xpath连续累计过多，影响后边的内容。
+#抓不全，时间寻找出错，有些网页会没有内容，会导致xpath连续错误累计过多，影响后边的内容。
 
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,3000000)]#1893603#如果超限会返回404错误
+    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1696952)]#1893603#如果超限会返回404错误
 
     def start_requests(self):
         for url in self.urls:
@@ -35,7 +35,7 @@ class newssc(scrapy.Spider):
                                                'isIndex_request':True})
     def deal_content(self, response):
         if response.status == 404:
-            return CloseSpider()
+            return CloseSpider()#这样设计靠谱吗？
 
         if response.request.cookies:
             cookies = response.request.cookies
@@ -78,7 +78,14 @@ class newssc(scrapy.Spider):
             'spider_time':spider_time,
             'reply_node':[]
         }
-        Save_org_file(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=response.body)
-        Save_zip(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news')
+        # cmt_url='http://changyan.sohu.com/api/2/topic/comments?client_id=cyrHnxhFx&page_size=30&topic_id=630645353&page_no=1'
+        Re_find_sid=re.compile(r'sid="\d*?"')
+        sid=Re_find_sid.findall(response.body)#为了找到评论
+        print sid
+
+
+        cmt_url='http://changyan.sohu.com/api/3/topic/liteload?client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id='
+
+        # yield scrapy.Request(url=)
         Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
         print data

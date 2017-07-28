@@ -15,6 +15,18 @@ import os
 
 #需要添加的功能:1,定时启动设置,2,关于redis的清空设置,3线程速度控制
 
+# xilu网站是有下一页的（完成）
+
+#自动识别模块部分有bug，title找出来的都是head中的title，不是正文模块中的title，这肯定会导致正文部分找不准，以至于时间寻找部分也找不准
+
+
+#遗留问题：
+#时间的正则查找不是太好，容易找错，而且后向引用没有设置好。
+#chengdu网的comment没有设计好，里边很多网页不是手机版的，不过我估计手机版和电脑版的内容有重复，因为今天涛哥打开了一个我一直用手机版网页来看的网页的电脑版。
+
+
+
+
 max_threads=2
 SLEEP_TIME=5
 
@@ -91,4 +103,4 @@ if __name__ == '__main__':
 
     # run_processSpider(spider_name_list)
 
-    cmdline.execute('scrapy crawl xilu'.split())
+    cmdline.execute('scrapy crawl chengdu'.split())

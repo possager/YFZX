@@ -120,9 +120,9 @@ class souhunews(scrapy.Spider):
         #     print response.xpath('/html/body/section[1]/article/h1/text()').extract()[0]
         # except Exception as e:
         #     print e
-        Save_org_file(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
-        Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
-                 newsidOrtid=response.meta['id'], datatype='news')
+        # Save_org_file(plantform='sohu',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
+        # Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+        #          newsidOrtid=response.meta['id'], datatype='news')
 
         url= response.url
         publish_user= response.meta['publish_user']
@@ -203,10 +203,10 @@ class souhunews(scrapy.Spider):
 
     def deal_content2(self,response):
         # print response.url
-        Save_org_file(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
-                      newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
-        Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
-                 newsidOrtid=response.meta['id'], datatype='news')
+        # Save_org_file(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+        #               newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
+        # Save_zip(plantform='sohu', date_time=response.meta['publish_time'], urlOruid=response.url,
+        #          newsidOrtid=response.meta['id'], datatype='news')
 
 
         data_TCPI=gather_all_funtion.get_result_you_need(response)

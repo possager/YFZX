@@ -5,7 +5,14 @@ import json
 import time
 import random
 
+#公司的购买的代理
+#http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1
+#http://dps.kuaidaili.com/api/getdps/?orderid=940097016277555&num=50&ut=1&sep=1
+################################这个是一般的
 
+#公司购买的私密代理
+#http://dps.kuaidaili.com/api/getdps/?orderid=940097016277555&num=50&ut=1&format=json&sep=1
+#################################这个是好用的，但是ip变了，还需要验证登陆
 
 
 pool1=redis.ConnectionPool(host='localhost',port=6379)
@@ -13,12 +20,18 @@ redis1=redis.Redis(connection_pool=pool1)
 
 
 def get_Proxy():
-
+    headers={
+        'Accept-Encoding': 'gzip'
+    }
     def get_proxy_to_redis():
         session1=requests.session()
-        proxy_url='http://dps.kuaidaili.com/api/getdps/?orderid=940097016277555&num=50&ut=1&format=json&sep=1 '
-        webdata=session1.request(method='GET',url=proxy_url)
+        proxy_url='http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1'
+################################这个是一般的'
+        webdata=session1.request(method='GET',url=proxy_url,headers=headers)
+        # print webdata
         data_json=json.loads(webdata.text)
+        print data_json
+        # print data_json
         for proxyip in data_json['data']['proxy_list']:
             print proxyip
             # redis1.rpush('999',proxyip)

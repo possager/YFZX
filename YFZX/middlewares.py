@@ -174,6 +174,9 @@ class responseToWhereMiddleware(object):
 
             elif 'http://changyan.sohu.com/api/3/topic/liteload?&client_id=cysYw3AKM&page_size=30&hot_size=10&topic_source_id=' in request.url:#高能预警，这里绝对不是sohu的爬虫，是xilu的，但是无奈的是它就会传入这个网站。
                 request.callback=spider.deal_comment
+            elif 'http://changyan.sohu.com/api/2/topic/comments?client_id=cyrHnxhFx&page_size=30&topic_id=' in request.url:
+                request.callback=spider.deal_comment
+
         elif 'panda.qq.com' in request.url:
             if '//panda.qq.com/cd/interface/topic/' in request.url and 'pagesize' in request.url:
                 request.callback=spider.deal_index

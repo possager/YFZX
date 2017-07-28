@@ -192,7 +192,7 @@ class chinadaily(scrapy.Spider):
             reply_count= one_comment['reply_count']#reply_count
             url = response.url
             reply_nodes = []
-            time_format = '’%Y-%m-%d %X'
+            time_format = '%Y-%m-%d %X'
             spider_time = time.strftime(time_format, time.localtime())
             one_nodes={
                 'content':content,

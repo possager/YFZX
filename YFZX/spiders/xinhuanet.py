@@ -27,8 +27,6 @@ class xinhuanet(scrapy.Spider):
             yield scrapy.Request(url=url,headers=headers,cookies={},meta={'plant_form':'None'})
 
 
-
-
     def deal_index(self, response):
         if response.request.cookies:
             cookies=response.request.cookies
@@ -76,8 +74,8 @@ class xinhuanet(scrapy.Spider):
             yield scrapy.Request(url=url, headers=headers, cookies=cookies,meta=thismeta)
 
     def deal_content(self,response):
-        Save_org_file(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
-        Save_zip(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news')
+        # Save_org_file(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news',full_data=response.body)
+        # Save_zip(plantform='xinhuanet',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news')
 
 
 

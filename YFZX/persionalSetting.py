@@ -69,7 +69,7 @@ def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,foru
         timeArray = examing_datetime_format(date_time)
         date_time_strip=str(int(time.mktime(timeArray)))
         # print date_time_strip
-    elif len(date_time)==10 or (len(date_time) >=13 and len(date_time)<17):
+    elif len(date_time)==10 or (len(date_time) >=13 and len(date_time)<17) or '.' in date_time:
         date_time_strip=str(date_time.split('.')[0])
     else:
         print 'Wrong'
@@ -77,8 +77,14 @@ def Save_result(plantform,date_time,urlOruid,newsidOrtid,datatype,full_data,foru
         date_time_strip='date_time_Wrong'
 
     if datatype == 'news':#如果是新闻,格式是:平台名称（或者英文）_ 言论发布时间戳 _ 新闻URL的MD5码
-        result_file = plantform + '_' + str(date_time_strip) + '_' + str(hashlib.md5(urlOruid).hexdigest()) + '_' + str(newsidOrtid)
-        file_path=basic_file+'/'+str(plantform)+'/'+'speeches'+'/'+str(date_time.split(' ')[0])
+        result_file = plantform + '_' + str(date_time_strip) + '_' + str(hashlib.md5(urlOruid).hexdigest()) + '_' + str(newsidOrtid)#7-27日发现这里的文件夹的名字可能是时间戳
+        ###############################################################  7-27 日  ########################################################
+        timeArray2=time.localtime(float(date_time_strip))
+        dt_new=time.strftime("%Y-%m-%d %H:%M:%S",timeArray2)
+        ###############################################################  7-27 日  ########################################################
+
+
+        file_path=basic_file+'/'+str(plantform)+'/'+'speeches'+'/'+str(dt_new.split(' ')[0])
         file=file_path+'/'+result_file
 
         if os.path.exists(file_path):
