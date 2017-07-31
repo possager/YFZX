@@ -6,6 +6,7 @@ import time
 import random
 
 #公司的购买的代理
+#一般的代理http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=1&an_an=1&an_ha=1&sp1=1&quality=2&sort=1&format=json&sep=1
 #http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1
 #http://dps.kuaidaili.com/api/getdps/?orderid=940097016277555&num=50&ut=1&sep=1
 ################################这个是一般的
@@ -25,7 +26,7 @@ def get_Proxy():
     }
     def get_proxy_to_redis():
         session1=requests.session()
-        proxy_url='http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=2&an_an=1&an_ha=1&sp1=1&quality=2&format=json&sep=1'
+        proxy_url='http://svip.kuaidaili.com/api/getproxy/?orderid=953994536123042&num=100&b_pcchrome=1&b_pcie=1&b_pcff=1&protocol=1&method=1&an_an=1&an_ha=1&sp1=1&quality=2&sort=1&format=json&sep=1'
 ################################这个是一般的'
         webdata=session1.request(method='GET',url=proxy_url,headers=headers)
         # print webdata
@@ -46,6 +47,10 @@ def get_Proxy():
 
 def get_proxy_from_redis():
     # return redis1.hget()
+    #730增加当队列为空的时候的一个等待操作
+    while redis1.llen('999')<10:
+        print 'proxy pool in redis is fewer than 10,please examing reids pool'
+        time.sleep(2)
     return redis1.rpop('999')
 
 def test_proxy():

@@ -35,7 +35,7 @@ class newssc(scrapy.Spider):
                                                'isIndex_request':True})
     def deal_content(self, response):
         if response.status == 404:
-            return CloseSpider()#这样设计靠谱吗？
+            return#这样设计靠谱吗？
 
         if response.request.cookies:
             cookies = response.request.cookies
@@ -82,10 +82,53 @@ class newssc(scrapy.Spider):
         Re_find_sid=re.compile(r'sid="\d*?"')
         sid=Re_find_sid.findall(response.body)#为了找到评论
         print sid
+        sidnum=sid[0].split('"')[1]
+
+        cmt_url_with_out_num='http://changyan.sohu.com/api/3/topic/liteload?&client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id='
+        cmt_url_to_visit=cmt_url_with_out_num+sidnum
 
 
-        cmt_url='http://changyan.sohu.com/api/3/topic/liteload?client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id='
-
-        # yield scrapy.Request(url=)
-        Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
+        yield scrapy.Request(url=cmt_url_to_visit,headers=headers,cookies=cookies,meta=data)
+        # Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
         print data
+
+
+    def deal_comment(self,response):
+        datajson=json.loads(response.body)
+        datajson_comments=datajson['comments']
+
+        data=response.meta
+        comments_data=[]
+
+        if not datajson_comments:
+            Save_result(plantform='chengdu', date_time=data['publish_time'], urlOruid=data['url'],
+                        newsidOrtid=data['id'], datatype='news', full_data=data)
+            return
+        else:
+            for someone_comment in datajson_comments:
+                # id=i['comment_id']
+                # content=i['content']
+                # publish_time=i['create_time']
+                # publish_user=i['passport']['']
+                content = someone_comment['content']  # content
+                id = someone_comment['comment_id']  # id
+                publish_user_photo = someone_comment['passport']['img_url']  # publish_user_photo
+                publish_user = someone_comment['passport']['nickname']  # publish_user
+                publish_user_id = someone_comment['passport']['user_id']  # publish_user_id
+                create_time = someone_comment['create_time']  # publish_time
+                spider_time = time.time()
+
+                thiscomments = {
+                    'content': content,
+                    'id': id,
+                    'publish_user_photo': publish_user_photo,
+                    'publish_user': publish_user,
+                    'publish_user_id': publish_user_id,
+                    'create_time': create_time,
+                    'spider_time': spider_time
+                }
+                comments_data.append(thiscomments)
+            data['reply_node']=comments_data
+
+
+        Save_result(plantform='chengdu',date_time=data['publish_time'],urlOruid=data['url'],newsidOrtid=data['id'],datatype='news',full_data=data)

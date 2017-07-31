@@ -174,7 +174,7 @@ class responseToWhereMiddleware(object):
 
             elif 'http://changyan.sohu.com/api/3/topic/liteload?&client_id=cysYw3AKM&page_size=30&hot_size=10&topic_source_id=' in request.url:#高能预警，这里绝对不是sohu的爬虫，是xilu的，但是无奈的是它就会传入这个网站。
                 request.callback=spider.deal_comment
-            elif 'http://changyan.sohu.com/api/2/topic/comments?client_id=cyrHnxhFx&page_size=30&topic_id=' in request.url:
+            elif 'http://changyan.sohu.com/api/3/topic/liteload?&client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id=' in request.url:#这个是
                 request.callback=spider.deal_comment
 
         elif 'panda.qq.com' in request.url:
@@ -184,12 +184,12 @@ class responseToWhereMiddleware(object):
                 request.callback=spider.deal_content
             elif '//panda.qq.com/cd/interface/topic/getRepliesByTid?s_code=&tid=' in request.url:
                 request.callback=spider.deal_comment
-        elif 'www.toutiao.com' in request.url:
-            if '//www.toutiao.com/api/pc/feed/' in request.url:
+        elif 'toutiao.com' in request.url:
+            if 'toutiao.com/api/pc/feed/' in request.url:
                 request.callback=spider.deal_index
-            elif '//www.toutiao.com/group/' in request.url:
+            elif 'toutiao.com/group/' in request.url:
                 request.callback=spider.deal_content
-            elif 'http://www.toutiao.com/api/comment/list/?group_id=' in request.url:
+            elif 'toutiao.com/api/comment/list/?group_id=' in request.url:
                 request.callback=spider.deal_comment
         elif 'wa.news.cn' in request.url or 'xinhuanet' in request.url or 'news.xinhuanet.com' in request.url or 'http://comment.home.news.cn/a/newsCommAll.do?_ksTS=' in request.url:
             Re_result=Re_pattern_xinhuanet_content.findall(request.url)
@@ -225,6 +225,7 @@ class responseToWhereMiddleware(object):
             print '          W      R     O      N      G      IN     middleware'
             print '          the url is ---',request.url
             print '#########################################################################'
+            raise  IgnoreRequest()
 
 class HttpProxyMiddleware(object):
     def process_request(self,request,spider):
@@ -309,9 +310,6 @@ class RetryMiddleware(object):
             reason = response_status_message(response.status)
             request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
             return self._retry(request,reason,spider) or response
-
-
-
         return response
 
     def process_exception(self, request, exception, spider):#当timeout出现次数过多的时候，会进入这个模块，比如连续5次错误，出现timeouterror的时候，debug里报这种错误 Gave up retrying

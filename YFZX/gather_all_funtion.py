@@ -11,7 +11,7 @@ def get_result_you_need(response):
     thisdict, thisclass = deal_response.deal_response(response)
     xpath = get_content.getxpath(thisdict)
     title_return = get_title.get_title(thisclass)
-    content_xpath= xpath[0]
+    # content_xpath= xpath[0]
     # print title_return  # title是一个只包含一个内容的的字典{title:xpath}
     # print title_return
     if not title_return:

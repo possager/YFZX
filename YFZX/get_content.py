@@ -100,7 +100,7 @@ def getxpath(response_list):
         else:
             return result_dict2[1]
     else:
-        if len(result_dict2[0][0].split('/'))>2:#注意，这个想四川新闻王的话不能这么用，因为四川新闻网的不懂地区的网页是不一样的，但是url链接却是一样的，用这个会出问题。
+        if len(result_dict2[0][0].split('/'))>5:#注意，这个想四川新闻王的话不能这么用，因为四川新闻网的不懂地区的网页是不一样的，但是url链接却是一样的，用这个会出问题。
            return save_xpath_redis(result_dict2[0],url=response_list['url'],plant_from=response_list['plant_form'])
             # return result_dict2[0]
         else:
@@ -126,7 +126,7 @@ def save_xpath_redis(xpath_and_tuple,url,plant_from):#判断plantform要么在�
         dict_xpath[key]=xpath_list_from_redis.count(key)
     dict_xpath2=sorted(dict_xpath.iteritems(),key=lambda x:x[1],reverse=True)
     # return dict_xpath2
-    if len(dict_xpath2[0][0].split('/'))<3:
+    if len(dict_xpath2[0][0].split('/'))<5:
         try:
             return dict_xpath2[1]
         except Exception as e:
