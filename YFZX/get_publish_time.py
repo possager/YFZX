@@ -10,7 +10,8 @@ def find_time(referenceBlock_str):
 
     Re_find_time_taoge2 = re.compile(
         r'\d{4}?([年|\/|\/|\.|\s|\-]*?)\d{1,2}([月|\/|\/|\.|\s|\-]*?)\d{1,2}([日|\/|\/|\.|\s|\-]*?)\s*?\d{1,2}([\:|时|\-]*?)\d{1,2}([\:|分|\-]*?)\d{1,2}([\:|秒|\-]?)')
-    Re_find_time_730 = re.compile(r'\d{4}([\:|\/|\-|\.])\d{2}\1\d{2}\s{1,3}\d{1,2}([\:\-])\d{1,2}[\2\d{1,2}]?')  # 效果更好的时间查找模块
+    Re_find_time_730 = re.compile(r'\d{4}([\:|\/|\-|\.])\d{2}\1\d{2}\s{1,3}\d{1,2}([\:\-])\d{1,2}[\2\d{1,2}]?')  # 效果更好的时间查找模块，但是没法找到2017/06/02
+    # Re_find_time_81=re.compile(r'\d{4}([\:|\/|\-|\.])\d{2}\1\d{2}\s{1,3}\d{1,2}([\:\-])\d{1,2}[\2\d{1,2}]?')
 
     try:
         publish_time = Re_find_time_730.search(referenceBlock_str).group().replace('/','-')

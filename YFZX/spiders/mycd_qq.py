@@ -30,7 +30,7 @@ class mycd_qq(scrapy.Spider):
                  'Referer':'http://panda.qq.com/cd/index',
                  'X-Requested-With':'XMLHttpRequest'#关键,没有这个会出现请求过期
                  }
-        url='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=900&pagesize=10'#7-27日改为900，因为昨天停下来了，但是900多貌似后边就都是空的了
+        url='http://panda.qq.com/cd/interface/topic/getRecThreads?s_code=&page=1&pagesize=10'#7-27日改为900，因为昨天停下来了，但是900多貌似后边就都是空的了
         time.sleep(random.randint(2,3))
         yield scrapy.Request(url=url,cookies={'pgv_info':'ssid=s2580718070', 'ts_last':'panda.qq.com/cd/index', 'pgv_pvid':'6693827820', 'ts_uid':'6358905536', 'pgv_pvi':'7088397312', 'pgv_si':'s8851519488'},
                              headers=headers,meta={'plant_form':'None',
@@ -120,15 +120,9 @@ class mycd_qq(scrapy.Spider):
         yield scrapy.Request(url=urlindex_next,headers=headers,cookies=cookies,meta={'plant_form':'None','download_timeout':3,'isIndex_request':True})
 
     def deal_content(self,response):
-        # Save_org_file(plantform='mycdqq', date_time=response.meta['publish_time'], urlOruid=response.url,#这里边的网页的回复本身就是json
-        #             newsidOrtid=response.meta['id'], datatype='news', full_data=response.body)
-        # Save_zip(plantform='mycdqq',date_time=response.meta['publish_time'],urlOruid=response.url,newsidOrtid=response.meta['id'],datatype='news')
-
         headers=response.request.headers
         for i in response.headers:
             headers[i]=response.headers[i]
-
-
         print 'in deal_content'
         print response.body
         json_in_content=json.loads(response.body)
@@ -249,8 +243,3 @@ class mycd_qq(scrapy.Spider):
             }
             result_json=json.dumps(resultdict)
             Save_result(plantform='mycdqq',date_time=response.meta['publish_time'],urlOruid=response.meta['url'],newsidOrtid=response.meta['id'],datatype='news',full_data=resultdict)
-
-
-
-    # def close(spider, reason):
-    #     raise CloseSpider('nothing')

@@ -99,8 +99,6 @@ if __name__ == '__main__':
     # spider_name_list=['xilu']
     # run_multprocess(spider_name_list)
     # run_multprocess2()
-
-
     # run_processSpider(spider_name_list)
 
-    cmdline.execute('scrapy crawl toutiao'.split())
+    cmdline.execute('scrapy crawl mycdqq'.split())

@@ -79,7 +79,6 @@ class xilu(scrapy.Spider):
             id= one_index['rfilename']#rfilename
             url_page='http://m.xilu.com/v/'+str(id)+'.html'#http://m.xilu.com/v/1000010001000897.html#因为会有http://m.xilu.com/list_1142.html这样的网页
             if len(url_page)>39:
-
                 yield scrapy.http.FormRequest(url=url_page,method='post',headers=headers,meta={
                     'data':{
                         'title':title,

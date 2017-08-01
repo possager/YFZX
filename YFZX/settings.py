@@ -50,7 +50,8 @@ SPIDER_MIDDLEWARES = {
     # 'YFZX.middlewares.YfzxSpiderMiddleware': 543,
     # 'YFZX.middlewares.refuseMiddleware': 300,
     # 'YFZX.middlewares.DownloadTimeoutMiddleware':301,
-    'YFZX.middlewares.RetryMiddleware':302
+    'YFZX.middlewares.RetryMiddleware':305,
+    'YFZX.middlewares.caculate_timeout_middleware':304
 
 
 }
@@ -61,7 +62,8 @@ DOWNLOADER_MIDDLEWARES = {
     # 'YFZX.middlewares.MyCustomDownloaderMiddleware': 543,
     'YFZX.middlewares.responseToWhereMiddleware': 300,
     'YFZX.middlewares.HttpProxyMiddleware':301,
-    'YFZX.middlewares.RetryMiddleware':302
+    # 'YFZX.middlewares.RetryMiddleware':302,
+    # 'YFZX.middlewares.caculate_timeout_middleware':
 
 
 }

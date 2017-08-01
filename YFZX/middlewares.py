@@ -9,9 +9,10 @@ from scrapy.exceptions import IgnoreRequest
 from YFZX.persionalSetting import Exam_exist
 import scrapy
 from scrapy.exceptions import CloseSpider
-from YFZX.proxy_to_redis import get_proxy_from_redis
+# from YFZX.proxy_to_redis import get_proxy_from_redis
 # from YFZX.examing_redis import change
 # import threading
+import time
 
 
 
@@ -37,6 +38,11 @@ from scrapy.utils.response import response_status_message
 from scrapy.core.downloader.handlers.http11 import TunnelError
 from scrapy.utils.python import global_object_name
 logger = logging.getLogger(__name__)
+
+from proxy_to_redis import proxy_sendback
+
+
+
 ###########################retry middleware############################
 ############################7-25日添加#################################
 pool1=redis.ConnectionPool(host='localhost',port=6379)
@@ -95,32 +101,20 @@ class YfzxSpiderMiddleware(object):
         spider.logger.info('Spider opened: %s' % spider.name)
 
 class responseToWhereMiddleware(object):
+
     def process_request(self, request, spider):
-
-
         #添加的判断是否重复功能的模块,带plant_form的就不需要进行防虫处理，没有的就需要处理
-        # if request.meta['plant_form']!='None':
-        #     url_request=request.url
-        #     hash_url=str(hashlib.md5(url_request).hexdigest())
-        #     thisclass=path_to_redis()
-        #     num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])#防重
-        #     num_exist= thisclass.redis.get(str(request.meta['plant_form']))#这里没有使用change函数转到相应的键值对,是因为这里就直接以网站的plant_from来作为键值对的名字的
-        #     # print num_exist
-        #     if num_exist is not None and int(num_exist)>100:
-        #         # raise CloseSpider()
-        #         # return IgnoreRequest
-        #         num_plant_form = request.meta['plant_form']
-        #         thisclass.redis.set(num_plant_form+'_has_crawled',0)
-        #         raise CloseSpider()
-        #         # request.callback=spider.close
-        #         # return request
-        #     if num_result==0:
-        #         # num_plant_form = change(request.meta['plant_form'])
-        #         num_plant_form=request.meta['plant_form']
-        #         thisclass.redis.incr(num_plant_form)
-        #         num_exist = thisclass.redis.get(num_plant_form)
-        #         print request.url,'has been crawled'
-        #         # raise IgnoreRequest()#已经爬去过了
+        request.meta['time_a']=time.time()
+        if request.meta['plant_form']!='None':
+            thisclass=path_to_redis()
+            num_result=thisclass.examing(url_to_exam=request.url,plantform=request.meta['plant_form'])#防重
+            num_exist=thisclass.getRepeatnum(request.meta['plant_form'])
+            if num_exist is not None and int(num_exist)>100:#一个阈值
+                thisclass.resetRedis(plantform=request.meta['plant_form'])
+                raise CloseSpider()
+            elif num_result==0:
+                print request.url,'has been crawled,so,ignoreRequest will be raise'
+                raise IgnoreRequest()#已经爬去过了
 
         Re_pattern_newssc_index = re.compile(r'\bhttp://.*?\.newssc\.org/\B')  # 不知道为什么这里的\b和\B作用刚好相反,可能雨scrapy有关
         Re_pattern_newssc_news = re.compile(r'\bhttp://.*?\.newssc\.org/system/\d{8}/\d{9}.html')
@@ -150,9 +144,6 @@ class responseToWhereMiddleware(object):
                     request.callback = spider.deal_content_from_news
                 else:
                     request.callback=spider.deal_index_from_webpage
-
-
-
         elif 'wap.chengdu.cn' in request.url:
             request.callback=spider.deal_content
         elif 'sohu.com' in request.url:
@@ -176,7 +167,6 @@ class responseToWhereMiddleware(object):
                 request.callback=spider.deal_comment
             elif 'http://changyan.sohu.com/api/3/topic/liteload?&client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id=' in request.url:#这个是
                 request.callback=spider.deal_comment
-
         elif 'panda.qq.com' in request.url:
             if '//panda.qq.com/cd/interface/topic/' in request.url and 'pagesize' in request.url:
                 request.callback=spider.deal_index
@@ -234,6 +224,7 @@ class HttpProxyMiddleware(object):
             proxy_ip='http://'+get_proxy_from_redis()
             request.meta['proxy']=proxy_ip
             request.meta['download_timeout']=7
+            request.meta['time_1':time.time()]
 
             print 'set proxy successfully'
         except Exception as e:
@@ -241,19 +232,20 @@ class HttpProxyMiddleware(object):
 
         pass
 
-# class refuseMiddleware(object):
-#     def process_spider_input(self,response,spider):
-#         if response.status in [400,403,404]:#这里还缺少一个url被404的次数
-#             request_retry1= response.request
-#             proxy_ip = 'http://' + get_proxy_from_redis()
-#             request_retry1.meta['proxy']=proxy_ip
-#             return request_retry1
-#         if response.request.meta['isIndex_request']:
-#             request_retry1 = response.request
-#             proxy_ip = 'http://' + get_proxy_from_redis()
-#             request_retry1.meta['proxy'] = proxy_ip
-#             # return request_retry1
-
+class refuseMiddleware(object):
+    def process_spider_input(self,response,spider):
+        if response.status in [400,403,404,429]:#这里还缺少一个url被404的次数
+            request_retry1= response.request
+            proxy_ip = 'http://' + get_proxy_from_redis()
+            request_retry1.meta['proxy']=proxy_ip
+            request_retry1.meta['time_a']=time.time()
+            return request_retry1
+        if response.request.meta['isIndex_request']:
+            request_retry1 = response.request
+            proxy_ip = 'http://' + get_proxy_from_redis()
+            request_retry1.meta['proxy'] = proxy_ip
+            request_retry1.meta['time_a']=time.time()
+            # return request_retry1
 
 class DownloadTimeoutMiddleware(object):
     def __init__(self, timeout=7):
@@ -293,6 +285,7 @@ class RetryMiddleware(object):
     @classmethod
     def from_crawler(cls, crawler):
         print 'hello1'
+        # print response_status_message()
         return cls(crawler.settings)
 
     def process_response(self, request, response, spider):
@@ -303,12 +296,12 @@ class RetryMiddleware(object):
             reason = response_status_message(response.status)
             print 'i am retrying ~~~~~~'
             #7-25日发现这里也会有request，干脆见到request都来添加个proxy
-            request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
+            # request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理,在retry中还会有
             #7-25
             return self._retry(request, reason, spider) or response
         if response.status in [403,407]:#7-26日添加，发现有些网站返回407错误
             reason = response_status_message(response.status)
-            request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
+            # request.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理,在retry中还会有
             return self._retry(request,reason,spider) or response
         return response
 
@@ -318,8 +311,9 @@ class RetryMiddleware(object):
                 and not request.meta.get('dont_retry', False):
             print 'hello I am in retry up'
             return self._retry(request, exception, spider)
-        # else:
-        #     print 'I am in Retry----------`````~~~~~~'
+        else:
+            # print 'I am in Retry----------`````~~~~~~'
+            return self._retry(request, exception, spider)#针对429错误，强制再次访问
 
     def _retry(self, request, reason, spider):
         print 'hello4'
@@ -340,6 +334,7 @@ class RetryMiddleware(object):
             retryreq.dont_filter = True
             #####
             retryreq.meta['proxy']={'http':'http://'+get_proxy_from_redis()}#7-25日添加，每一次retry换代理
+            retryreq.meta['time_a']=time.time()
             ###########
 
             retryreq.priority = request.priority + self.priority_adjust
@@ -367,6 +362,7 @@ class RetryMiddleware(object):
                 retryreq.dont_filter = True
                 #####
                 retryreq.meta['proxy'] = {'http': 'http://' + get_proxy_from_redis()}  # 7-25日添加，每一次retry换代理
+                retryreq.meta['time_a']=time.time()
                 ###########
 
                 retryreq.priority = request.priority + self.priority_adjust
@@ -380,3 +376,25 @@ class RetryMiddleware(object):
             else:
                 # return IgnoreRequest()
                 print 'this request is not index_request,so be ingored'
+
+class caculate_timeout_middleware(object):
+    # print '--------------------------------------------------------------------------------------------------------i am in caculate_timeout_middleware'
+    def process_spider_exception(self, response, exception, spider):
+        print response.headers
+
+
+    def process_spider_input(self, response, spider):
+        print 'in caculate_timeout_middleware------------'
+        timeb = time.time()
+        timeused = timeb - response.meta['time_a']
+        if timeused < 5:
+            proxy_all = response.meta['proxy']
+            proxy = proxy_all.split('//')[1]
+            proxy_sendback(proxy)
+    # def process_response(self, request, response, spider):
+    #     timeb=time.time()
+    #     timeused=timeb-response.meta['time_a']
+    #     if timeused<5:
+    #         proxy_all=response.meta['proxy']
+    #         proxy=proxy_all.split('//')[1]
+    #         proxy_sendback(proxy)
