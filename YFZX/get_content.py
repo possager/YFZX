@@ -103,7 +103,10 @@ def getxpath(response_list):
         # if len(result_dict2[0][0].split('/'))>5:#注意，这个想四川新闻王的话不能这么用，因为四川新闻网的不懂地区的网页是不一样的，但是url链接却是一样的，用这个会出问题。
         xpath_to_charge=''
         while 'head' not in xpath_to_charge:
-            xpath_to_charge=result_dict2.pop()[0]
+            try:
+                xpath_to_charge=result_dict2.pop()[0]
+            except Exception as e:
+                print e
         return save_xpath_redis(result_dict2[0],url=response_list['url'],plant_from=response_list['plant_form'])
             # return result_dict2[0]
         # else:

@@ -91,5 +91,5 @@ if __name__ == '__main__':
 
 
     thisclass.creat_url_list_in_redis()
-    thisclass.scan(BASIC_FILE)
+    # thisclass.scan(BASIC_FILE)
     # thisclass.examing('baidu.com','baidu')

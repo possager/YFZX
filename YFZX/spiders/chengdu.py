@@ -27,7 +27,7 @@ import time
 
 class newssc(scrapy.Spider):
     name = 'chengdu'
-    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,1696952)]#1893603#如果超限会返回404错误
+    urls=['http://wap.chengdu.cn/'+str(i) for i in range(1696951,3000000)]#1893603#如果超限会返回404错误
 
     def start_requests(self):
         for url in self.urls:
@@ -82,15 +82,18 @@ class newssc(scrapy.Spider):
         Re_find_sid=re.compile(r'sid="\d*?"')
         sid=Re_find_sid.findall(response.body)#为了找到评论
         print sid
-        sidnum=sid[0].split('"')[1]
+        try:
+            sidnum=sid[0].split('"')[1]
 
-        cmt_url_with_out_num='http://changyan.sohu.com/api/3/topic/liteload?&client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id='
-        cmt_url_to_visit=cmt_url_with_out_num+sidnum
+            cmt_url_with_out_num='http://changyan.sohu.com/api/3/topic/liteload?&client_id=cyrHnxhFx&page_size=30&hot_size=5&topic_source_id='
+            cmt_url_to_visit=cmt_url_with_out_num+sidnum
 
 
-        yield scrapy.Request(url=cmt_url_to_visit,headers=headers,cookies=cookies,meta=data)
-        # Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
-        print data
+            yield scrapy.Request(url=cmt_url_to_visit,headers=headers,cookies=cookies,meta=data)
+            # Save_result(plantform='chengdu',date_time=publish_time,urlOruid=response.url,newsidOrtid=id,datatype='news',full_data=data)
+            print data#有可能同样的正则表达式同样的网页但是就是没有找到对应的sid
+        except Exception as e:
+            print e
 
 
     def deal_comment(self,response):

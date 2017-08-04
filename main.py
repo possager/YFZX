@@ -78,14 +78,14 @@ def run_multprocess2(crawl_queue=None):
 def run_processSpider(crawl_queue):
     subprocess_list=[]
     #F:/project/YFzhongxin/YFZX/YFZX/spiders
-    spider_path = '/media/liang/3804CCCA04CC8C76/project/YFzhongxin/YFZX/YFZX/spiders'#/media/liang/3804CCCA04CC8C76/project/YFzhongxin/YFZX/YFZX/spiders
+    spider_path = 'F:/project/YFzhongxin/YFZX/YFZX/spiders'#/media/liang/3804CCCA04CC8C76/project/YFzhongxin/YFZX/YFZX/spiders
     os.chdir(spider_path)
     while subprocess_list or crawl_queue:
         for subprocess_child in subprocess_list:
             retcode=subprocess_child.poll()
             if not retcode:
                 subprocess_list.remove(subprocess_child)
-        while len(subprocess_list) < 2 and crawl_queue:
+        while len(subprocess_list) < 4 and crawl_queue:
             subprocess_new=subprocess.Popen(['scrapy','crawl',crawl_queue.pop()])
             subprocess_list.append(subprocess_new)
             subprocess_new.wait()
@@ -101,4 +101,5 @@ if __name__ == '__main__':
     # run_multprocess2()
     # run_processSpider(spider_name_list)
 
-    cmdline.execute('scrapy crawl mycdqq'.split())
+    cmdline.execute('scrapy crawl xilu'.split())
+    # run_processSpider(['mycdqq','chengdu'])
